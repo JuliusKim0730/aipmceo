@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme tokens */
+:root{
+  --bg:#0B0F16;
+  --ink:#ECF0F1;
+  --brand:#243B7A;
+  --accent:#1ABC9C;
+  --muted:#7F8C8D;
+  --warn:#C0392B;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.slide-gradient {
+  background: radial-gradient(1200px 600px at 70% -10%, rgba(36,59,122,0.35), transparent 60%),
+              radial-gradient(900px 500px at -10% 10%, rgba(28,188,156,0.18), transparent 55%),
+              linear-gradient(180deg, rgba(11,15,22,0.95), rgba(11,15,22,1));
+}
+

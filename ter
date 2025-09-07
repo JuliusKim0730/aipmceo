@@ -1,0 +1,8 @@
+[33m632377a[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m chore(landing): polish landing + role-based guard wiring
+[33mf50bb4a[m chore(auth): improve Google OAuth stability - add provider parameters (prompt, include_granted_scopes) - fallback to signInWithRedirect on popup errors
+[33m49703b6[m feat(auth): enable Google login via dynamic auth-service import; init auth; fallback to local mode
+[33mc70c607[m Fix Firebase authentication errors - Improve error handling and fallback to local mode
+[33m7f3c41b[m Add Google Social Login with Firebase Auth - Complete authentication system with UI and user management
+[33m3a13a78[m Disable Firebase completely - Use local mode only to fix connection errors
+[33mfa97857[m Resolve merge conflicts and update Firebase configuration
+[33m5650a23[m Fix Firebase configuration with updated API keys and settings
