@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npx http-server -p 8000 -c-1",
     "start": "npx http-server -p 8000",
-    "build": "echo 'No build process needed for static files'",
+    "build": "echo 'Static files ready in public directory'",
     "firebase:init": "firebase init",
     "firebase:deploy": "firebase deploy"
   },
