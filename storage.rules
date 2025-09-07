@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 슬라이드 이미지 저장 규칙
+    match /slides/{chapterNum}/{pageNum}/{imageFile} {
+      // 읽기: 모든 사용자 허용 (공개 이미지)
+      allow read: if true;
+      
+      // 쓰기: 이미지 파일만 허용, 크기 제한 5MB
+      allow write: if request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+      
+      // 삭제: 편집 권한이 있는 사용자만
+      allow delete: if true;
+      
+      // 프로덕션에서는 인증 규칙 추가 권장:
+      // allow write, delete: if request.auth != null;
+    }
+    
+    // 기타 파일에 대한 기본 규칙
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
