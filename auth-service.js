@@ -1,5 +1,4 @@
 // 인증 서비스
-import { auth, googleProvider } from './firebase-config.js';
 import { 
     signInWithPopup, 
     signOut, 
@@ -7,15 +6,53 @@ import {
     signInAnonymously 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
+let auth, googleProvider;
+
+// Firebase 설정 동적 로드
+async function loadFirebaseConfig() {
+    try {
+        const firebaseConfig = await import('./firebase-config.js');
+        auth = firebaseConfig.auth;
+        googleProvider = firebaseConfig.googleProvider;
+        return true;
+    } catch (error) {
+        console.error('Firebase 설정 로드 실패:', error);
+        return false;
+    }
+}
+
 class AuthService {
     constructor() {
         this.currentUser = null;
         this.authStateCallbacks = [];
-        this.initializeAuthListener();
+        this.isInitialized = false;
+        this.initializeService();
+    }
+
+    // 서비스 초기화
+    async initializeService() {
+        try {
+            const configLoaded = await loadFirebaseConfig();
+            if (!configLoaded || !auth) {
+                throw new Error('Firebase 설정을 로드할 수 없습니다.');
+            }
+            
+            this.initializeAuthListener();
+            this.isInitialized = true;
+            console.log('AuthService 초기화 완료');
+        } catch (error) {
+            console.error('AuthService 초기화 실패:', error);
+            this.isInitialized = false;
+        }
     }
 
     // 인증 상태 리스너 초기화
     initializeAuthListener() {
+        if (!auth) {
+            console.error('Auth 객체가 없습니다.');
+            return;
+        }
+        
         onAuthStateChanged(auth, (user) => {
             this.currentUser = user;
             console.log('인증 상태 변경:', user ? `로그인됨 (${user.email})` : '로그아웃됨');
@@ -43,6 +80,13 @@ class AuthService {
 
     // 구글 로그인
     async signInWithGoogle() {
+        if (!this.isInitialized || !auth || !googleProvider) {
+            return {
+                success: false,
+                error: 'Firebase 인증이 초기화되지 않았습니다.'
+            };
+        }
+        
         try {
             console.log('구글 로그인 시도 중...');
             
@@ -96,6 +140,13 @@ class AuthService {
 
     // 익명 로그인 (게스트 모드)
     async signInAnonymously() {
+        if (!this.isInitialized || !auth) {
+            return {
+                success: false,
+                error: 'Firebase 인증이 초기화되지 않았습니다.'
+            };
+        }
+        
         try {
             console.log('익명 로그인 시도 중...');
             
@@ -125,6 +176,13 @@ class AuthService {
 
     // 로그아웃
     async signOut() {
+        if (!this.isInitialized || !auth) {
+            return {
+                success: false,
+                error: 'Firebase 인증이 초기화되지 않았습니다.'
+            };
+        }
+        
         try {
             console.log('로그아웃 시도 중...');
             

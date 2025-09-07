@@ -75,8 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // 편집 기능 활성화
         setupEditingFeatures();
         
-        // 인증 기능 초기화
-        await initializeAuth();
+        // 인증 기능 초기화 (비동기, 실패해도 계속 진행)
+        initializeAuth().catch(error => {
+            console.warn('인증 초기화 실패, 로컬 모드로 계속:', error);
+        });
         
         // 로컬 데이터 로드
         loadSavedData();
@@ -1288,11 +1290,13 @@ async function initializeAuth() {
     try {
         console.log('🔐 인증 시스템 초기화 중...');
         
-        // Firebase 모듈 로드
+        // Firebase 모듈 로드 시도
         const firebaseLoaded = await loadFirebaseModule();
         
         if (!firebaseLoaded || !authService) {
-            throw new Error('인증 서비스를 로드할 수 없습니다.');
+            console.warn('Firebase 모듈 로드 실패 - 로컬 모드로 전환');
+            enableLocalMode();
+            return;
         }
         
         // 인증 이벤트 리스너 설정
@@ -1306,23 +1310,36 @@ async function initializeAuth() {
         
         console.log('✅ 인증 시스템 초기화 완료');
         
+        // 인증 UI 표시
+        if (authContainer) {
+            authContainer.style.display = 'block';
+        }
+        
     } catch (error) {
         console.error('❌ 인증 시스템 초기화 실패:', error);
-        console.log('📝 로컬 모드로 전환합니다.');
-        
-        // 인증 실패 시 로컬 모드
-        window.isFirebaseMode = false;
-        
-        // 편집 모드 버튼 숨김 (인증 필요)
-        if (editModeToggle) {
-            editModeToggle.style.display = 'none';
-        }
-        
-        // 인증 UI 숨김
-        if (authContainer) {
-            authContainer.style.display = 'none';
-        }
+        enableLocalMode();
     }
+}
+
+// 로컬 모드 활성화
+function enableLocalMode() {
+    console.log('📝 로컬 모드로 전환합니다.');
+    
+    // Firebase 모드 플래그 해제
+    window.isFirebaseMode = false;
+    
+    // 편집 모드 버튼 표시 (로컬 모드에서도 사용 가능)
+    if (editModeToggle) {
+        editModeToggle.style.display = 'block';
+    }
+    
+    // 인증 UI 숨김
+    if (authContainer) {
+        authContainer.style.display = 'none';
+    }
+    
+    // 로컬 모드 안내 메시지
+    showSaveStatus('로컬 모드로 실행 중 (인증 없이 편집 가능)', 'saved');
 }
 
 // 인증 이벤트 리스너 설정
