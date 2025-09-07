@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기획자의 AI 창업 - 왜 안하시나요?</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 프레젠테이션 컨테이너 -->
+    <div class="presentation-container">
+        <!-- 페이지 넘버링 UI -->
+        <div class="page-indicator">
+            <span class="current-page">1</span> / <span class="total-pages">80</span>
+            <div class="chapter-info">Chapter 1</div>
+        </div>
+
+        <!-- 네비게이션 컨트롤 -->
+        <div class="nav-controls">
+            <button class="nav-btn prev-btn" id="prevBtn" disabled>◀</button>
+            <button class="nav-btn next-btn" id="nextBtn">▶</button>
+        </div>
+
+        <!-- 프로그레스 바 -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- 슬라이드 컨테이너 -->
+        <div class="slide-container" id="slideContainer">
+            <!-- Chapter 1 - Pages 1-10 -->
+            <div class="slide active" data-chapter="1" data-page="1">
+                <div class="slide-content unified-slide">
+                    <div class="slide-title" data-field="title">
+                        <span class="content">기획자가 AI로 창업할 수 있을까?</span>
+                        <span class="empty-content edit-only">제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-subtitle" data-field="subtitle">
+                        <span class="content">AI, 창업, 그리고 기획자의 미래. 오늘 그 이야기를 시작합니다.</span>
+                        <span class="empty-content edit-only">부제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-image" data-field="image">
+                        <span class="empty-content edit-only">이미지를 업로드하세요</span>
+                    </div>
+                    <div class="slide-context" data-field="context">
+                        <span class="content">강렬한 메인 타이틀로 시작하는 AI 창업 프레젠테이션입니다.</span>
+                        <span class="empty-content edit-only">내용을 입력하세요</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="2">
+                <div class="slide-content unified-slide">
+                    <div class="slide-title" data-field="title">
+                        <span class="content">강의 구성</span>
+                        <span class="empty-content edit-only">제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-subtitle" data-field="subtitle">
+                        <span class="content">Intro → 현실 공감 → 창업 유형 → 장벽 → 우리가 팔아야 할 것 → 가이드 & 희망</span>
+                        <span class="empty-content edit-only">부제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-image" data-field="image">
+                        <div class="timeline-layout">
+                            <div class="timeline-left">
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>Intro</h3>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>현실 공감</h3>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>창업 유형</h3>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>장벽</h3>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>우리가 팔아야 할 것</h3>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <h3>가이드 & 희망</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="empty-content edit-only">이미지를 업로드하세요</span>
+                    </div>
+                    <div class="slide-context" data-field="context">
+                        <span class="content">오늘 우리가 함께 떠날 여정입니다</span>
+                        <span class="empty-content edit-only">내용을 입력하세요</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="3">
+                <div class="slide-content question-slide">
+                    <div class="question-background">
+                        <div class="question-mark-large">❓</div>
+                    </div>
+                    <div class="question-content">
+                        <h2>질문 1</h2>
+                        <h1>여러분, AI 창업을 꿈꿔본 적 있으신가요?</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="4">
+                <div class="slide-content">
+                    <h2>질문 2</h2>
+                    <h3>무엇을 상상하셨나요? 앱? 툴? 인플루언서?</h3>
+                    <div class="three-cards">
+                        <div class="card-item">
+                            <div class="card-icon">📱</div>
+                            <h4>앱</h4>
+                            <p>모바일 애플리케이션</p>
+                        </div>
+                        <div class="card-item">
+                            <div class="card-icon">🤖</div>
+                            <h4>AI 툴</h4>
+                            <p>인공지능 도구</p>
+                        </div>
+                        <div class="card-item">
+                            <div class="card-icon">🎆</div>
+                            <h4>인플루언서</h4>
+                            <p>콘텐츠 크리에이터</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="5">
+                <div class="slide-content question-slide">
+                    <div class="thinking-person">🤔</div>
+                    <div class="question-content">
+                        <h2>질문 3</h2>
+                        <h1>아직 해보지 않으셨나요?<br/>왜일까요?</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="6">
+                <div class="slide-content reason-slide">
+                    <div class="reason-layout">
+                        <div class="reason-icon-large">💰</div>
+                        <div class="reason-content">
+                            <h2>자본의 문제</h2>
+                            <p>자본이 부족해서 시작조차 못하는 경우</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="7">
+                <div class="slide-content tech-slide">
+                    <div class="tech-layout">
+                        <div class="code-background">
+                            <div class="code-lines">
+                                <div class="code-line">function createAI() {</div>
+                                <div class="code-line">  // 어떻게 시작하죠?</div>
+                                <div class="code-line">  return "???"; </div>
+                                <div class="code-line">}</div>
+                            </div>
+                        </div>
+                        <div class="tech-content">
+                            <h2>기술의 문제</h2>
+                            <p>코드를 몰라서 시도조차 두려운 경우</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="8">
+                <div class="slide-content fear-slide">
+                    <div class="fear-animation">
+                        <div class="falling-blocks">
+                            <div class="block"></div>
+                            <div class="block"></div>
+                            <div class="block"></div>
+                        </div>
+                    </div>
+                    <div class="fear-content">
+                        <h2>실패의 두려움</h2>
+                        <p>실패가 두렵고, 시간 낭비가 걱정되기 때문입니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="9">
+                <div class="slide-content conclusion-slide">
+                    <div class="conclusion-content">
+                        <h2>결론</h2>
+                        <h1>"돈이 있어도 못하는 이유 → AI 창업도 같습니다"</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-chapter="1" data-page="10">
+                <div class="slide-content summary-slide">
+                    <div class="summary-layout">
+                        <div class="summary-keywords">
+                            <div class="keyword-box">
+                                <h3>지속</h3>
+                            </div>
+                            <div class="keyword-box">
+                                <h3>수익화</h3>
+                            </div>
+                        </div>
+                        <div class="summary-content">
+                            <h2>챕터 요약</h2>
+                            <h1>문제는 '시도'가 아니라<br/>'지속과 수익화'</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 2 시작 -->
+            <div class="slide" data-chapter="2" data-page="11">
+                <div class="slide-content youtube-ai-slide">
+                    <div class="youtube-ai-bg"></div>
+                    <div class="title-overlay">
+                        <h1>유튜브 붐과 AI 창업</h1>
+                        <p>유튜브 붐 때와 AI 창업은 닮아있습니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 나머지 페이지들은 JavaScript에서 동적으로 생성 -->
+        </div>
+
+        <!-- 키보드 단축키 안내 -->
+        <div class="keyboard-help" id="keyboardHelp">
+            <h3>키보드 단축키</h3>
+            <p>← → : 페이지 이동</p>
+            <p>Space : 다음 페이지</p>
+            <p>H : 도움말 토글</p>
+            <p>F : 전체화면</p>
+            <p>E : 편집 모드 토글</p>
+        </div>
+
+        <!-- 편집 모드 토글 버튼 -->
+        <button class="edit-mode-toggle" id="editModeToggle">
+            📝 편집 모드
+        </button>
+
+        <!-- 저장 상태 표시 -->
+        <div class="save-status" id="saveStatus">
+            저장 중...
+        </div>
+    </div>
+
+    <!-- 텍스트 편집 모달 -->
+    <div class="text-edit-modal" id="textEditModal">
+        <div class="text-edit-content">
+            <h3 id="textEditTitle">텍스트 편집</h3>
+            <textarea id="textEditTextarea" placeholder="텍스트를 입력하세요..."></textarea>
+            <div class="text-edit-buttons">
+                <button class="btn btn-secondary" id="textEditCancel">취소</button>
+                <button class="btn btn-primary" id="textEditSave">
+                    <span class="save-text">저장</span>
+                    <span class="loading-spinner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 업로드 모달 -->
+    <div class="image-upload-modal" id="imageUploadModal">
+        <div class="image-upload-content">
+            <h3 id="imageUploadTitle">이미지 업로드</h3>
+            <div class="image-upload-area" id="imageUploadArea">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">
+                    클릭하거나 이미지를 드래그하여 업로드하세요<br/>
+                    <small>JPG, PNG, GIF 파일 지원 (최대 5MB)</small>
+                </div>
+            </div>
+                    <input type="file" class="file-input" id="fileInput" accept="image/*" title="이미지 파일 선택">
+                    <div id="imagePreviewContainer" class="image-preview-container">
+                        <img class="image-preview" id="imagePreview" alt="미리보기">
+                    </div>
+            <div class="text-edit-buttons">
+                <button class="btn btn-secondary" id="imageUploadCancel">취소</button>
+                <button class="btn btn-primary" id="imageUploadSave" disabled>
+                    <span class="save-text">업로드</span>
+                    <span class="loading-spinner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Scripts -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
