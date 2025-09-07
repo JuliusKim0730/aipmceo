@@ -119,34 +119,25 @@ body {
     gap: 12px;
 }
 
-.header-controls .user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 .header-controls .user-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.header-controls .user-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-shrink: 0;
 }
 
 .header-controls .user-name {
     color: white;
     font-size: 14px;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .header-controls .user-email {
     color: rgba(255, 255, 255, 0.7);
     font-size: 12px;
+    white-space: nowrap;
 }
 
 /* Presentation Container - 1920x1080 최적화 */

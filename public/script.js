@@ -1523,7 +1523,10 @@ function updateAuthUI(user) {
         
         // 사용자 정보 표시
         if (userName) {
-            userName.textContent = user.displayName || '사용자';
+            const userRole = getUserRole(user);
+            const roleEmoji = userRole === 'instructor' ? '👨‍🏫' : '👨‍🎓';
+            const roleName = userRole === 'instructor' ? '강사' : '학생';
+            userName.textContent = `${roleEmoji} ${user.displayName || roleName}`;
         }
         
         if (userEmail) {
@@ -1552,9 +1555,44 @@ function updateAuthUI(user) {
     }
 }
 
+// 사용자 권한 체크
+function getUserRole(user) {
+    if (!user) return 'guest';
+    
+    // 강사 계정 목록
+    const instructorEmails = [
+        'meangyun0729@gmail.com'
+    ];
+    
+    if (instructorEmails.includes(user.email)) {
+        return 'instructor';
+    }
+    
+    return 'student'; // 일반 회원
+}
+
 // 편집 모드 접근 권한 업데이트
 function updateEditModeAccess(user) {
     if (!editModeToggle) return;
+    
+    const userRole = getUserRole(user);
+    
+    if (userRole === 'instructor') {
+        // 강사는 편집 가능
+        editModeToggle.style.display = 'block';
+        editModeToggle.disabled = false;
+        console.log('👨‍🏫 강사 권한: 편집 모드 활성화');
+    } else if (userRole === 'student') {
+        // 일반 회원은 편집 불가능
+        editModeToggle.style.display = 'none';
+        editModeToggle.disabled = true;
+        console.log('👨‍🎓 학생 권한: 편집 모드 비활성화');
+    } else {
+        // 게스트는 편집 불가능
+        editModeToggle.style.display = 'none';
+        editModeToggle.disabled = true;
+        console.log('👤 게스트: 편집 모드 비활성화');
+    }
     
     if (!user) {
         // 로그아웃된 사용자는 편집 모드 사용 불가
