@@ -994,8 +994,11 @@ async function saveTextEdit() {
     
     // UI 업데이트
     showSaveStatus('저장 중...', 'saving');
-    textEditSave.querySelector('.save-text').style.display = 'none';
-    textEditSave.querySelector('.loading-spinner').style.display = 'inline-block';
+    const saveTextElement = textEditSave.querySelector('.save-text');
+    const loadingSpinner = textEditSave.querySelector('.loading-spinner');
+    
+    if (saveTextElement) saveTextElement.style.display = 'none';
+    if (loadingSpinner) loadingSpinner.style.display = 'inline-block';
     
     try {
         // 현재 페이지의 챕터와 페이지 번호 계산
@@ -1044,8 +1047,11 @@ async function saveTextEdit() {
         console.error('텍스트 저장 오류:', error);
         showSaveStatus('저장 실패', 'error');
     } finally {
-        textEditSave.querySelector('.save-text').style.display = 'inline';
-        textEditSave.querySelector('.loading-spinner').style.display = 'none';
+        const saveTextElement = textEditSave.querySelector('.save-text');
+        const loadingSpinner = textEditSave.querySelector('.loading-spinner');
+        
+        if (saveTextElement) saveTextElement.style.display = 'inline';
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
     }
 }
 
@@ -1126,8 +1132,11 @@ async function saveImageUpload() {
     
     // UI 업데이트
     showSaveStatus('업로드 중...', 'saving');
-    imageUploadSave.querySelector('.save-text').style.display = 'none';
-    imageUploadSave.querySelector('.loading-spinner').style.display = 'inline-block';
+    const saveTextElement = imageUploadSave.querySelector('.save-text');
+    const loadingSpinner = imageUploadSave.querySelector('.loading-spinner');
+    
+    if (saveTextElement) saveTextElement.style.display = 'none';
+    if (loadingSpinner) loadingSpinner.style.display = 'inline-block';
     
     try {
         // 현재 페이지의 챕터와 페이지 번호 계산
@@ -1207,8 +1216,11 @@ async function saveImageUpload() {
         console.error('이미지 업로드 오류:', error);
         showSaveStatus('업로드 실패', 'error');
     } finally {
-        imageUploadSave.querySelector('.save-text').style.display = 'inline';
-        imageUploadSave.querySelector('.loading-spinner').style.display = 'none';
+        const saveTextElement = imageUploadSave.querySelector('.save-text');
+        const loadingSpinner = imageUploadSave.querySelector('.loading-spinner');
+        
+        if (saveTextElement) saveTextElement.style.display = 'inline';
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
     }
 }
 
