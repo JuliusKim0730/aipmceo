@@ -1,16 +1,10 @@
-// Firebase 및 편집 기능 import (조건부)
+// Firebase 비활성화 - 로컬 모드만 사용
 let slideService = null;
 
-// Firebase 모듈 동적 로드
+// Firebase 모듈 동적 로드 (비활성화)
 async function loadFirebaseModule() {
-    try {
-        const module = await import('./slide-service.js');
-        slideService = module.slideService;
-        return true;
-    } catch (error) {
-        console.warn('Firebase 모듈 로드 실패:', error);
-        return false;
-    }
+    console.log('Firebase 모듈 로드 비활성화됨 - 로컬 모드 사용');
+    return false;
 }
 
 // 전역 변수
@@ -72,10 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
             editModeToggle.style.display = 'block';
         }
         
-        // Firebase 초기화는 백그라운드에서 시도 (실패해도 무시)
-        initializeFirebase().catch(() => {
-            console.log('Firebase 연결 실패 - 로컬 모드 계속 사용');
-        });
+        // Firebase 비활성화 - 로컬 모드만 사용
+        console.log('🔥 Firebase 비활성화됨 - 로컬 모드로 작동합니다.');
         
         // 페이지 로드 애니메이션
         setTimeout(() => {
@@ -1075,15 +1067,8 @@ async function saveTextEdit() {
         saveToLocalStorage(chapterNum, pageNum, fieldType, newText);
         showSaveStatus('저장 완료', 'saved');
         
-        // Firebase가 활성화된 경우 추가로 Firebase에도 저장
-        if (window.isFirebaseMode && slideService) {
-            try {
-                await slideService.updateSlideText(chapterNum, pageNum, fieldType, newText);
-                console.log('Firebase 백업 저장 완료');
-            } catch (error) {
-                console.warn('Firebase 백업 저장 실패:', error);
-            }
-        }
+        // Firebase 비활성화 - 로컬 저장만 사용
+        console.log('로컬 저장 완료 (Firebase 비활성화됨)');
         
         closeTextEditModal();
     } catch (error) {
@@ -1246,15 +1231,8 @@ async function saveImageUpload() {
             saveToLocalStorage(chapterNum, pageNum, saveKey, imageUrl);
             showSaveStatus('이미지 저장 완료', 'saved');
             
-            // Firebase가 활성화된 경우 추가로 Firebase에도 저장
-            if (window.isFirebaseMode && slideService) {
-                try {
-                    await slideService.updateSlideImage(chapterNum, pageNum, saveKey, file);
-                    console.log('Firebase 이미지 백업 저장 완료');
-                } catch (error) {
-                    console.warn('Firebase 이미지 백업 저장 실패:', error);
-                }
-            }
+            // Firebase 비활성화 - 로컬 저장만 사용
+            console.log('로컬 이미지 저장 완료 (Firebase 비활성화됨)');
             
             closeImageUploadModal();
         };
@@ -1293,68 +1271,26 @@ function updateEditButtonsOnPageChange() {
     }
 }
 
-// Firebase 초기화
+// Firebase 초기화 (비활성화)
 async function initializeFirebase() {
-    try {
-        console.log('🔥 Firebase 초기화 시도 중...');
-        
-        // Firebase 모듈 로드 시도
-        const firebaseLoaded = await loadFirebaseModule();
-        
-        if (!firebaseLoaded || !slideService) {
-            throw new Error('Firebase 모듈을 로드할 수 없습니다.');
-        }
-        
-        // Firebase 연결 테스트
-        await slideService.initializeAllSlides();
-        
-        // Firebase에서 데이터 로드
-        await loadFirebaseData();
-        
-        console.log('✅ Firebase 초기화 완료');
-        
-        // Firebase 모드 플래그 설정
-        window.isFirebaseMode = true;
-        
-    } catch (error) {
-        console.error('❌ Firebase 초기화 실패:', error);
-        console.log('📝 로컬 모드로 전환합니다.');
-        
-        // Firebase 모드 플래그 해제
-        window.isFirebaseMode = false;
-        
-        // Firebase 실패 시 로컬 데이터 로드
-        loadSavedData();
-    }
+    console.log('🔥 Firebase 비활성화됨 - 로컬 모드로 작동합니다.');
     
-    // 편집 모드 버튼 활성화 (Firebase/로컬 모드 공통)
+    // Firebase 모드 플래그 해제
+    window.isFirebaseMode = false;
+    
+    // 로컬 데이터 로드
+    loadSavedData();
+    
+    // 편집 모드 버튼 활성화
     if (editModeToggle) {
         editModeToggle.style.display = 'block';
     }
 }
 
-// Firebase에서 데이터 로드
+// Firebase에서 데이터 로드 (비활성화)
 async function loadFirebaseData() {
-    try {
-        const allSlides = await slideService.loadAllSlides();
-        
-        Object.keys(allSlides).forEach(slideKey => {
-            const slideData = allSlides[slideKey];
-            const [, chapterNum, pageNum] = slideKey.split('-');
-            const slideIndex = parseInt(pageNum) - 1;
-            
-            if (slides[slideIndex]) {
-                const slide = slides[slideIndex];
-                updateSlideWithData(slide, slideData);
-            }
-        });
-        
-        console.log('💾 Firebase 데이터를 로드했습니다.');
-    } catch (error) {
-        console.error('Firebase 데이터 로드 오류:', error);
-        // 실패 시 로컬 데이터로 폴백
-        loadSavedData();
-    }
+    console.log('Firebase 데이터 로드 비활성화됨 - 로컬 데이터 사용');
+    loadSavedData();
 }
 
 // 슬라이드 데이터로 업데이트
