@@ -111,7 +111,7 @@ Firebase 연동 편집 가능한 인터랙티브 프레젠테이션
    npx http-server -p 8000
    ```
 
-3. 브라우저에서 `http://localhost:8000` 접속
+3. 브라우저에서 `http://localhost:3000` 접속
 
 ### 편집 모드 사용법
 
