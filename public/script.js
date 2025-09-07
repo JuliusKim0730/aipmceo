@@ -1,10 +1,18 @@
-// Firebase 비활성화 - 로컬 모드만 사용
+// Firebase 및 인증 서비스 import
 let slideService = null;
+let authService = null;
 
-// Firebase 모듈 동적 로드 (비활성화)
+// Firebase 모듈 동적 로드
 async function loadFirebaseModule() {
-    console.log('Firebase 모듈 로드 비활성화됨 - 로컬 모드 사용');
-    return false;
+    try {
+        const authModule = await import('./auth-service.js');
+        authService = authModule.authService;
+        console.log('인증 서비스 로드 완료');
+        return true;
+    } catch (error) {
+        console.warn('Firebase 모듈 로드 실패:', error);
+        return false;
+    }
 }
 
 // 전역 변수
@@ -43,6 +51,17 @@ const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 const imageUploadSave = document.getElementById('imageUploadSave');
 const imageUploadCancel = document.getElementById('imageUploadCancel');
 
+// 인증 관련 DOM 요소들
+const authContainer = document.getElementById('authContainer');
+const authLogin = document.getElementById('authLogin');
+const authProfile = document.getElementById('authProfile');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const guestLoginBtn = document.getElementById('guestLoginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const userEmail = document.getElementById('userEmail');
+
 // 초기화
 document.addEventListener('DOMContentLoaded', function() {
     try {
@@ -56,18 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // 편집 기능 활성화
         setupEditingFeatures();
         
-        // 로컬 모드로 시작 (Firebase는 선택사항)
-        console.log('📝 로컬 편집 모드로 시작합니다.');
-        window.isFirebaseMode = false;
+        // 인증 기능 초기화
+        await initializeAuth();
+        
+        // 로컬 데이터 로드
         loadSavedData();
-        
-        // 편집 모드 버튼 활성화
-        if (editModeToggle) {
-            editModeToggle.style.display = 'block';
-        }
-        
-        // Firebase 비활성화 - 로컬 모드만 사용
-        console.log('🔥 Firebase 비활성화됨 - 로컬 모드로 작동합니다.');
         
         // 페이지 로드 애니메이션
         setTimeout(() => {
@@ -1271,26 +1283,241 @@ function updateEditButtonsOnPageChange() {
     }
 }
 
-// Firebase 초기화 (비활성화)
-async function initializeFirebase() {
-    console.log('🔥 Firebase 비활성화됨 - 로컬 모드로 작동합니다.');
-    
-    // Firebase 모드 플래그 해제
-    window.isFirebaseMode = false;
-    
-    // 로컬 데이터 로드
-    loadSavedData();
-    
-    // 편집 모드 버튼 활성화
-    if (editModeToggle) {
-        editModeToggle.style.display = 'block';
+// 인증 초기화
+async function initializeAuth() {
+    try {
+        console.log('🔐 인증 시스템 초기화 중...');
+        
+        // Firebase 모듈 로드
+        const firebaseLoaded = await loadFirebaseModule();
+        
+        if (!firebaseLoaded || !authService) {
+            throw new Error('인증 서비스를 로드할 수 없습니다.');
+        }
+        
+        // 인증 이벤트 리스너 설정
+        setupAuthEventListeners();
+        
+        // 인증 상태 변경 리스너 등록
+        authService.onAuthStateChange((user) => {
+            updateAuthUI(user);
+            updateEditModeAccess(user);
+        });
+        
+        console.log('✅ 인증 시스템 초기화 완료');
+        
+    } catch (error) {
+        console.error('❌ 인증 시스템 초기화 실패:', error);
+        console.log('📝 로컬 모드로 전환합니다.');
+        
+        // 인증 실패 시 로컬 모드
+        window.isFirebaseMode = false;
+        
+        // 편집 모드 버튼 숨김 (인증 필요)
+        if (editModeToggle) {
+            editModeToggle.style.display = 'none';
+        }
+        
+        // 인증 UI 숨김
+        if (authContainer) {
+            authContainer.style.display = 'none';
+        }
     }
 }
 
-// Firebase에서 데이터 로드 (비활성화)
-async function loadFirebaseData() {
-    console.log('Firebase 데이터 로드 비활성화됨 - 로컬 데이터 사용');
-    loadSavedData();
+// 인증 이벤트 리스너 설정
+function setupAuthEventListeners() {
+    // 구글 로그인 버튼
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
+    
+    // 게스트 로그인 버튼
+    if (guestLoginBtn) {
+        guestLoginBtn.addEventListener('click', handleGuestLogin);
+    }
+    
+    // 로그아웃 버튼
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+}
+
+// 구글 로그인 처리
+async function handleGoogleLogin() {
+    if (!authService) return;
+    
+    // 로딩 상태 표시
+    setButtonLoading(googleLoginBtn, true);
+    
+    try {
+        const result = await authService.signInWithGoogle();
+        
+        if (result.success) {
+            console.log('구글 로그인 성공:', result.user);
+            showSaveStatus('로그인 성공!', 'saved');
+        } else {
+            console.error('구글 로그인 실패:', result.error);
+            showSaveStatus(result.error, 'error');
+        }
+    } catch (error) {
+        console.error('구글 로그인 오류:', error);
+        showSaveStatus('로그인 중 오류가 발생했습니다.', 'error');
+    } finally {
+        setButtonLoading(googleLoginBtn, false);
+    }
+}
+
+// 게스트 로그인 처리
+async function handleGuestLogin() {
+    if (!authService) return;
+    
+    // 로딩 상태 표시
+    setButtonLoading(guestLoginBtn, true);
+    
+    try {
+        const result = await authService.signInAnonymously();
+        
+        if (result.success) {
+            console.log('게스트 로그인 성공:', result.user);
+            showSaveStatus('게스트로 로그인했습니다.', 'saved');
+        } else {
+            console.error('게스트 로그인 실패:', result.error);
+            showSaveStatus(result.error, 'error');
+        }
+    } catch (error) {
+        console.error('게스트 로그인 오류:', error);
+        showSaveStatus('게스트 로그인 중 오류가 발생했습니다.', 'error');
+    } finally {
+        setButtonLoading(guestLoginBtn, false);
+    }
+}
+
+// 로그아웃 처리
+async function handleLogout() {
+    if (!authService) return;
+    
+    // 로딩 상태 표시
+    setButtonLoading(logoutBtn, true);
+    
+    try {
+        const result = await authService.signOut();
+        
+        if (result.success) {
+            console.log('로그아웃 성공');
+            showSaveStatus('로그아웃되었습니다.', 'saved');
+            
+            // 편집 모드 비활성화
+            if (isEditMode) {
+                disableEditMode();
+            }
+        } else {
+            console.error('로그아웃 실패:', result.error);
+            showSaveStatus(result.error, 'error');
+        }
+    } catch (error) {
+        console.error('로그아웃 오류:', error);
+        showSaveStatus('로그아웃 중 오류가 발생했습니다.', 'error');
+    } finally {
+        setButtonLoading(logoutBtn, false);
+    }
+}
+
+// 버튼 로딩 상태 설정
+function setButtonLoading(button, isLoading) {
+    if (!button) return;
+    
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('loading');
+        
+        // 로딩 스피너 추가
+        if (!button.querySelector('.loading-spinner')) {
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            button.appendChild(spinner);
+        }
+        
+        // 버튼 텍스트 숨김
+        const textElements = button.querySelectorAll(':not(.loading-spinner)');
+        textElements.forEach(el => {
+            if (el.nodeType === Node.TEXT_NODE || el.tagName !== 'DIV') {
+                el.style.display = 'none';
+            }
+        });
+    } else {
+        button.disabled = false;
+        button.classList.remove('loading');
+        
+        // 로딩 스피너 제거
+        const spinner = button.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+        
+        // 버튼 텍스트 표시
+        const textElements = button.querySelectorAll(':not(.loading-spinner)');
+        textElements.forEach(el => {
+            el.style.display = '';
+        });
+    }
+}
+
+// 인증 UI 업데이트
+function updateAuthUI(user) {
+    if (!authLogin || !authProfile) return;
+    
+    if (user) {
+        // 로그인 상태
+        authLogin.style.display = 'none';
+        authProfile.style.display = 'block';
+        
+        // 사용자 정보 표시
+        if (userName) {
+            userName.textContent = user.displayName || '사용자';
+        }
+        
+        if (userEmail) {
+            userEmail.textContent = user.email || (user.isAnonymous ? '게스트 사용자' : '이메일 없음');
+        }
+        
+        if (userAvatar) {
+            if (user.photoURL && !user.isAnonymous) {
+                userAvatar.src = user.photoURL;
+                userAvatar.style.display = 'block';
+            } else {
+                // 기본 아바타 또는 게스트 아이콘
+                userAvatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2Yzc1N2QiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMFYyMkgxOFYyMEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
+                userAvatar.style.display = 'block';
+            }
+        }
+        
+        window.isFirebaseMode = true;
+    } else {
+        // 로그아웃 상태
+        authLogin.style.display = 'block';
+        authProfile.style.display = 'none';
+        
+        window.isFirebaseMode = false;
+    }
+}
+
+// 편집 모드 접근 권한 업데이트
+function updateEditModeAccess(user) {
+    if (!editModeToggle) return;
+    
+    if (user) {
+        // 로그인된 사용자는 편집 모드 사용 가능
+        editModeToggle.style.display = 'block';
+    } else {
+        // 로그아웃된 사용자는 편집 모드 사용 불가
+        editModeToggle.style.display = 'none';
+        
+        // 편집 모드가 활성화되어 있다면 비활성화
+        if (isEditMode) {
+            disableEditMode();
+        }
+    }
 }
 
 // 슬라이드 데이터로 업데이트
