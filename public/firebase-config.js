@@ -32,5 +32,9 @@ export const googleProvider = new GoogleAuthProvider();
 // Google Provider 설정
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+  include_granted_scopes: 'true'
+});
 
 export default app;

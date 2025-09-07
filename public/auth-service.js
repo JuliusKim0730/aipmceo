@@ -90,7 +90,21 @@ class AuthService {
         try {
             console.log('구글 로그인 시도 중...');
             
-            const result = await signInWithPopup(auth, googleProvider);
+            let result;
+            try {
+                result = await signInWithPopup(auth, googleProvider);
+            } catch (popupError) {
+                // 팝업 관련 오류는 리다이렉트로 대체
+                if (
+                    popupError?.code === 'auth/popup-blocked' ||
+                    popupError?.code === 'auth/popup-closed-by-user' ||
+                    popupError?.code === 'auth/cancelled-popup-request'
+                ) {
+                    await signInWithRedirect(auth, googleProvider);
+                    return { success: false, error: '리다이렉트 로그인으로 전환되었습니다.' };
+                }
+                throw popupError;
+            }
             const user = result.user;
             
             console.log('구글 로그인 성공:', {
