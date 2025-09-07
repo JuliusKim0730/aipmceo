@@ -8,13 +8,13 @@ async function loadFirebaseModule() {
         const module = await import('./auth-service.js');
         authService = module.authService || module.default || null;
         if (!authService) {
-            console.error('auth-service 모듈 로드 실패: authService가 없습니다.');
+            console.warn('auth-service 모듈 로드 실패: authService가 없습니다.');
             return false;
         }
         console.log('Firebase 모듈 로드 완료');
         return true;
     } catch (error) {
-        console.error('Firebase 모듈 로드 중 오류:', error);
+        console.warn('Firebase 모듈 로드 중 오류 (로컬 모드로 전환):', error);
         return false;
     }
 }
@@ -67,7 +67,7 @@ const userName = document.getElementById('userName');
 const userEmail = document.getElementById('userEmail');
 
 // 초기화
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     try {
         console.log('🎯 기획자의 AI 창업 프레젠테이션 초기화 중...');
         
@@ -84,7 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
         setupEditingFeatures();
         
         // 인증 초기화 (실패 시 로컬 모드로 자동 전환)
-        initializeAuth();
+        try {
+            await initializeAuth();
+        } catch (error) {
+            console.warn('인증 초기화 실패, 로컬 모드로 전환:', error);
+            enableLocalMode();
+        }
         
         // 로컬 데이터 로드
         loadSavedData();
@@ -1296,6 +1301,13 @@ async function initializeAuth() {
     try {
         console.log('🔐 인증 시스템 초기화 중...');
         
+        // 환경 체크 - 로컬 개발환경에서는 바로 로컬 모드로 전환
+        if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            console.log('🏠 로컬 개발환경 감지 - 로컬 모드로 전환');
+            enableLocalMode();
+            return;
+        }
+        
         // Firebase 모듈 로드 시도
         const firebaseLoaded = await loadFirebaseModule();
         
@@ -1322,7 +1334,7 @@ async function initializeAuth() {
         }
         
     } catch (error) {
-        console.error('❌ 인증 시스템 초기화 실패:', error);
+        console.warn('❌ 인증 시스템 초기화 실패 - 로컬 모드로 전환:', error);
         enableLocalMode();
     }
 }

@@ -71,7 +71,7 @@ const userName = document.getElementById('userName');
 const userEmail = document.getElementById('userEmail');
 
 // 초기화
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     try {
         console.log('🎯 기획자의 AI 창업 프레젠테이션 초기화 중...');
         
@@ -79,7 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
         showLanding();
         
         // 인증 초기화 (성공 시 역할에 따른 프레젠테이션 진입)
-        initializeAuth();
+        try {
+            await initializeAuth();
+        } catch (error) {
+            console.warn('인증 초기화 실패, 로컬 모드로 전환:', error);
+            enableLocalMode();
+        }
         
         // 로컬 데이터 로드
         loadSavedData();
@@ -1310,6 +1315,13 @@ async function initializeAuth() {
     try {
         console.log('🔐 인증 시스템 초기화 중...');
         
+        // 환경 체크 - 로컬 개발환경에서는 바로 로컬 모드로 전환
+        if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            console.log('🏠 로컬 개발환경 감지 - 로컬 모드로 전환');
+            enableLocalMode();
+            return;
+        }
+        
         // Firebase 모듈 로드 시도
         const firebaseLoaded = await loadFirebaseModule();
         
@@ -1334,9 +1346,9 @@ async function initializeAuth() {
         if (authContainer) {
             authContainer.style.display = 'block';
         }
-        
+
     } catch (error) {
-        console.error('❌ 인증 시스템 초기화 실패:', error);
+        console.warn('❌ 인증 시스템 초기화 실패 - 로컬 모드로 전환:', error);
         enableLocalMode();
     }
 }
@@ -1348,9 +1360,10 @@ function enableLocalMode() {
     // Firebase 모드 플래그 해제
     window.isFirebaseMode = false;
     
-    // 게스트는 편집 토글 숨김
+    // 로컬 모드에서는 편집 모드 활성화
     if (editModeToggle) {
-        editModeToggle.style.display = 'none';
+        editModeToggle.style.display = 'block';
+        editModeToggle.disabled = false;
     }
     
     // 인증 UI는 랜딩에서 처리
