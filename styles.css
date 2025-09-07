@@ -2285,7 +2285,7 @@ body {
     margin: 0;
 }
 
-/* 인증 UI 스타일 */
+/* 인증 UI 스타일 (기본 숨김) */
 .auth-container {
     position: fixed;
     top: 20px;
@@ -2298,6 +2298,7 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     min-width: 280px;
+    display: none; /* 기본적으로 숨김 */
 }
 
 .auth-login {

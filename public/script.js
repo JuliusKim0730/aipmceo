@@ -1,16 +1,20 @@
-// Firebase 및 인증 서비스 import
+// Firebase 모듈 연동 (동적 로드)
 let slideService = null;
 let authService = null;
 
-// Firebase 모듈 동적 로드
+// Firebase 모듈 로드 (동적 import)
 async function loadFirebaseModule() {
     try {
-        const authModule = await import('./auth-service.js');
-        authService = authModule.authService;
-        console.log('인증 서비스 로드 완료');
+        const module = await import('./auth-service.js');
+        authService = module.authService || module.default || null;
+        if (!authService) {
+            console.error('auth-service 모듈 로드 실패: authService가 없습니다.');
+            return false;
+        }
+        console.log('Firebase 모듈 로드 완료');
         return true;
     } catch (error) {
-        console.warn('Firebase 모듈 로드 실패:', error);
+        console.error('Firebase 모듈 로드 중 오류:', error);
         return false;
     }
 }
@@ -75,10 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 편집 기능 활성화
         setupEditingFeatures();
         
-        // 인증 기능 초기화 (비동기, 실패해도 계속 진행)
-        initializeAuth().catch(error => {
-            console.warn('인증 초기화 실패, 로컬 모드로 계속:', error);
-        });
+        // 인증 초기화 (실패 시 로컬 모드로 자동 전환)
+        initializeAuth();
         
         // 로컬 데이터 로드
         loadSavedData();
@@ -1323,23 +1325,25 @@ async function initializeAuth() {
 
 // 로컬 모드 활성화
 function enableLocalMode() {
-    console.log('📝 로컬 모드로 전환합니다.');
+    console.log('📝 로컬 모드로 실행합니다.');
     
     // Firebase 모드 플래그 해제
     window.isFirebaseMode = false;
     
-    // 편집 모드 버튼 표시 (로컬 모드에서도 사용 가능)
+    // 편집 모드 버튼 표시 (로컬 모드에서 사용 가능)
     if (editModeToggle) {
         editModeToggle.style.display = 'block';
     }
     
-    // 인증 UI 숨김
+    // 인증 UI 완전 숨김
     if (authContainer) {
         authContainer.style.display = 'none';
     }
     
-    // 로컬 모드 안내 메시지
-    showSaveStatus('로컬 모드로 실행 중 (인증 없이 편집 가능)', 'saved');
+    // 로컬 모드 환영 메시지
+    setTimeout(() => {
+        showSaveStatus('✨ 로컬 편집 모드 활성화됨', 'saved');
+    }, 1000);
 }
 
 // 인증 이벤트 리스너 설정
