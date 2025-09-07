@@ -101,37 +101,59 @@
             </div>
 
             <div class="slide" data-chapter="1" data-page="3">
-                <div class="slide-content question-slide">
-                    <div class="question-background">
-                        <div class="question-mark-large">❓</div>
+                <div class="slide-content unified-slide">
+                    <div class="slide-title" data-field="title">
+                        <span class="content">여러분, AI 창업을 꿈꿔본 적 있으신가요?</span>
+                        <span class="empty-content edit-only">제목을 입력하세요</span>
                     </div>
-                    <div class="question-content">
-                        <h2>질문 1</h2>
-                        <h1>여러분, AI 창업을 꿈꿔본 적 있으신가요?</h1>
+                    <div class="slide-subtitle" data-field="subtitle">
+                        <span class="content">질문 1</span>
+                        <span class="empty-content edit-only">부제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-image" data-field="image">
+                        <div class="question-mark-large">❓</div>
+                        <span class="empty-content edit-only">이미지를 업로드하세요</span>
+                    </div>
+                    <div class="slide-context" data-field="context">
+                        <span class="content">AI 창업에 대한 꿈과 상상을 자극하는 첫 번째 질문입니다.</span>
+                        <span class="empty-content edit-only">내용을 입력하세요</span>
                     </div>
                 </div>
             </div>
 
             <div class="slide" data-chapter="1" data-page="4">
-                <div class="slide-content">
-                    <h2>질문 2</h2>
-                    <h3>무엇을 상상하셨나요? 앱? 툴? 인플루언서?</h3>
-                    <div class="three-cards">
-                        <div class="card-item">
-                            <div class="card-icon">📱</div>
-                            <h4>앱</h4>
-                            <p>모바일 애플리케이션</p>
+                <div class="slide-content unified-slide">
+                    <div class="slide-title" data-field="title">
+                        <span class="content">무엇을 상상하셨나요? 앱? 툴? 인플루언서?</span>
+                        <span class="empty-content edit-only">제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-subtitle" data-field="subtitle">
+                        <span class="content">질문 2</span>
+                        <span class="empty-content edit-only">부제목을 입력하세요</span>
+                    </div>
+                    <div class="slide-image" data-field="image">
+                        <div class="three-cards">
+                            <div class="card-item">
+                                <div class="card-icon">📱</div>
+                                <h4>앱</h4>
+                                <p>모바일 애플리케이션</p>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-icon">🤖</div>
+                                <h4>AI 툴</h4>
+                                <p>인공지능 도구</p>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-icon">🎆</div>
+                                <h4>인플루언서</h4>
+                                <p>콘텐츠 크리에이터</p>
+                            </div>
                         </div>
-                        <div class="card-item">
-                            <div class="card-icon">🤖</div>
-                            <h4>AI 툴</h4>
-                            <p>인공지능 도구</p>
-                        </div>
-                        <div class="card-item">
-                            <div class="card-icon">🎆</div>
-                            <h4>인플루언서</h4>
-                            <p>콘텐츠 크리에이터</p>
-                        </div>
+                        <span class="empty-content edit-only">이미지를 업로드하세요</span>
+                    </div>
+                    <div class="slide-context" data-field="context">
+                        <span class="content">AI 창업의 다양한 형태를 제시하는 선택지 슬라이드입니다.</span>
+                        <span class="empty-content edit-only">내용을 입력하세요</span>
                     </div>
                 </div>
             </div>
@@ -296,6 +318,10 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="slide-service.js"></script>
+    
     <!-- Main Scripts -->
     <script type="module" src="script.js"></script>
 </body>

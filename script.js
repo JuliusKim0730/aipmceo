@@ -1,5 +1,5 @@
-// Firebase 및 편집 기능 import (나중에 활성화)
-// import { slideService } from './slide-service.js';
+// Firebase 및 편집 기능 import
+import { slideService } from './slide-service.js';
 
 // 전역 변수
 let currentPage = 1;
@@ -47,8 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI();
         setupEventListeners();
         
-        // 편집 기능 활성화 (로컬 저장)
+        // 편집 기능 활성화
         setupEditingFeatures();
+        
+        // Firebase 초기화
+        initializeFirebase();
         
         // 페이지 로드 애니메이션
         setTimeout(() => {
@@ -511,14 +514,16 @@ function setupEventListeners() {
 function handleKeyPress(e) {
     if (isAnimating) return;
     
-    // 편집 모드에서 텍스트 입력 중일 때는 네비게이션 키 무시
-    if (e.target.tagName === 'INPUT' || 
-        e.target.tagName === 'TEXTAREA' || 
-        e.target.contentEditable === 'true' ||
-        textEditModal?.classList.contains('show') ||
-        imageUploadModal?.classList.contains('show')) {
-        
-        // Escape 키만 허용
+    // 편집 모드에서 텍스트 입력 중이거나 모달이 열려있을 때는 네비게이션 키 무시
+    const isEditingText = e.target.tagName === 'INPUT' || 
+                         e.target.tagName === 'TEXTAREA' || 
+                         e.target.contentEditable === 'true';
+    const isModalOpen = textEditModal?.classList.contains('show') ||
+                       imageUploadModal?.classList.contains('show');
+    const isEditModeActive = isEditMode;
+    
+    if (isEditingText || isModalOpen || (isEditModeActive && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key))) {
+        // Escape 키와 편집 모드 토글(E)만 허용
         if (e.key === 'Escape') {
             if (textEditModal && textEditModal.classList.contains('show')) {
                 closeTextEditModal();
@@ -529,6 +534,16 @@ function handleKeyPress(e) {
             if (keyboardHelp && keyboardHelp.classList.contains('show')) {
                 hideKeyboardHelp();
             }
+        } else if (e.key === 'e' || e.key === 'E') {
+            if (!isEditingText && !isModalOpen) {
+                toggleEditMode();
+            }
+        }
+        
+        // 편집 모드에서 방향키는 완전히 차단
+        if (isEditModeActive && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+            e.preventDefault();
+            e.stopPropagation();
         }
         return;
     }
@@ -1029,19 +1044,29 @@ async function saveTextEdit() {
             currentEditElement.textContent = newText;
         }
         
-        // 로컬 스토리지에 저장
-        const slideKey = `slide-${chapterNum}-${pageNum}`;
-        const slideData = JSON.parse(localStorage.getItem('slideData') || '{}');
+        // Firebase에 저장
         const fieldType = currentEditElement.getAttribute('data-field') || textType;
         
-        slideData[slideKey] = {
-            ...slideData[slideKey],
-            [fieldType]: newText,
-            lastModified: new Date().toISOString()
-        };
-        localStorage.setItem('slideData', JSON.stringify(slideData));
+        try {
+            await slideService.updateSlideText(chapterNum, pageNum, fieldType, newText);
+            showSaveStatus('Firebase 저장 완료', 'saved');
+        } catch (error) {
+            console.error('Firebase 저장 실패:', error);
+            
+            // Firebase 실패 시 로컬 스토리지에 저장
+            const slideKey = `slide-${chapterNum}-${pageNum}`;
+            const slideData = JSON.parse(localStorage.getItem('slideData') || '{}');
+            
+            slideData[slideKey] = {
+                ...slideData[slideKey],
+                [fieldType]: newText,
+                lastModified: new Date().toISOString()
+            };
+            localStorage.setItem('slideData', JSON.stringify(slideData));
+            
+            showSaveStatus('로컬 저장 완료 (Firebase 연결 실패)', 'saved');
+        }
         
-        showSaveStatus('로컬 저장 완료', 'saved');
         closeTextEditModal();
     } catch (error) {
         console.error('텍스트 저장 오류:', error);
@@ -1196,19 +1221,29 @@ async function saveImageUpload() {
                 }
             }
             
-            // 로컬 스토리지에 저장
-            const slideKey = `slide-${chapterNum}-${pageNum}`;
-            const slideData = JSON.parse(localStorage.getItem('slideData') || '{}');
+            // Firebase에 저장
             const saveKey = fieldType === 'image' ? 'image' : `image_${imageType}`;
             
-            slideData[slideKey] = {
-                ...slideData[slideKey],
-                [saveKey]: imageUrl,
-                lastModified: new Date().toISOString()
-            };
-            localStorage.setItem('slideData', JSON.stringify(slideData));
+            try {
+                await slideService.updateSlideImage(chapterNum, pageNum, saveKey, file);
+                showSaveStatus('Firebase 저장 완료', 'saved');
+            } catch (error) {
+                console.error('Firebase 저장 실패:', error);
+                
+                // Firebase 실패 시 로컬 스토리지에 저장
+                const slideKey = `slide-${chapterNum}-${pageNum}`;
+                const slideData = JSON.parse(localStorage.getItem('slideData') || '{}');
+                
+                slideData[slideKey] = {
+                    ...slideData[slideKey],
+                    [saveKey]: imageUrl,
+                    lastModified: new Date().toISOString()
+                };
+                localStorage.setItem('slideData', JSON.stringify(slideData));
+                
+                showSaveStatus('로컬 저장 완료 (Firebase 연결 실패)', 'saved');
+            }
             
-            showSaveStatus('로컬 저장 완료', 'saved');
             closeImageUploadModal();
         };
         reader.readAsDataURL(file);
@@ -1246,7 +1281,110 @@ function updateEditButtonsOnPageChange() {
     }
 }
 
-// 저장된 데이터 로드
+// Firebase 초기화
+async function initializeFirebase() {
+    try {
+        console.log('🔥 Firebase 초기화 중...');
+        
+        // 모든 슬라이드 데이터 초기화
+        await slideService.initializeAllSlides();
+        
+        // Firebase에서 데이터 로드
+        await loadFirebaseData();
+        
+        console.log('✅ Firebase 초기화 완료');
+        
+        // 편집 모드 버튼 활성화
+        if (editModeToggle) {
+            editModeToggle.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('❌ Firebase 초기화 실패:', error);
+        console.log('📝 로컬 모드로 전환합니다.');
+        
+        // Firebase 실패 시 로컬 데이터 로드
+        loadSavedData();
+    }
+}
+
+// Firebase에서 데이터 로드
+async function loadFirebaseData() {
+    try {
+        const allSlides = await slideService.loadAllSlides();
+        
+        Object.keys(allSlides).forEach(slideKey => {
+            const slideData = allSlides[slideKey];
+            const [, chapterNum, pageNum] = slideKey.split('-');
+            const slideIndex = parseInt(pageNum) - 1;
+            
+            if (slides[slideIndex]) {
+                const slide = slides[slideIndex];
+                updateSlideWithData(slide, slideData);
+            }
+        });
+        
+        console.log('💾 Firebase 데이터를 로드했습니다.');
+    } catch (error) {
+        console.error('Firebase 데이터 로드 오류:', error);
+        // 실패 시 로컬 데이터로 폴백
+        loadSavedData();
+    }
+}
+
+// 슬라이드 데이터로 업데이트
+function updateSlideWithData(slide, slideData) {
+    Object.keys(slideData).forEach(fieldKey => {
+        if (fieldKey === 'lastModified') return;
+        
+        const fieldElement = slide.querySelector(`[data-field="${fieldKey}"]`);
+        if (fieldElement) {
+            const value = slideData[fieldKey];
+            
+            if (fieldKey === 'image') {
+                // 이미지 복원
+                if (value) {
+                    const emptySpan = fieldElement.querySelector('.empty-content');
+                    const existingImg = fieldElement.querySelector('img');
+                    
+                    if (existingImg) {
+                        existingImg.remove();
+                    }
+                    
+                    const img = document.createElement('img');
+                    img.src = value;
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '100%';
+                    img.style.objectFit = 'contain';
+                    
+                    fieldElement.appendChild(img);
+                    fieldElement.classList.remove('empty');
+                    
+                    if (emptySpan) {
+                        emptySpan.style.display = 'none';
+                    }
+                }
+            } else {
+                // 텍스트 복원
+                const contentSpan = fieldElement.querySelector('.content');
+                const emptySpan = fieldElement.querySelector('.empty-content');
+                
+                if (contentSpan && emptySpan) {
+                    if (value && value.trim()) {
+                        contentSpan.textContent = value;
+                        contentSpan.style.display = 'block';
+                        emptySpan.style.display = 'none';
+                    } else {
+                        contentSpan.style.display = 'none';
+                        emptySpan.style.display = 'block';
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 저장된 데이터 로드 (로컬 스토리지)
 function loadSavedData() {
     try {
         const savedData = JSON.parse(localStorage.getItem('slideData') || '{}');
