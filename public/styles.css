@@ -1,3 +1,12 @@
+/* Landing */
+.landing-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px;background:linear-gradient(135deg,#243B7A,#1E1E50)}
+.landing-inner{max-width:880px;width:100%;text-align:center;color:#fff}
+.landing-title{font-size:48px;line-height:1.2;margin:0 0 12px}
+.landing-subtitle{opacity:.9;margin:0 0 28px}
+.landing-actions{display:flex;gap:12px;justify-content:center}
+.landing-actions .auth-btn{padding:12px 18px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+.landing-actions .google-login-btn{background:#fff;color:#1E1E50}
+.landing-actions .guest-login-btn{background:#1ABC9C;color:#fff}
 /* Reset and Base Styles */
 * {
     margin: 0;

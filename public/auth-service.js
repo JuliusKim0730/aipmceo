@@ -3,10 +3,12 @@ import {
     signInWithPopup, 
     signOut, 
     onAuthStateChanged,
-    signInAnonymously 
+    signInAnonymously,
+    signInWithRedirect
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getDoc, setDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-let auth, googleProvider;
+let auth, googleProvider, db;
 
 // Firebase 설정 동적 로드
 async function loadFirebaseConfig() {
@@ -14,6 +16,7 @@ async function loadFirebaseConfig() {
         const firebaseConfig = await import('./firebase-config.js');
         auth = firebaseConfig.auth;
         googleProvider = firebaseConfig.googleProvider;
+        db = firebaseConfig.db;
         return true;
     } catch (error) {
         console.error('Firebase 설정 로드 실패:', error);
@@ -26,6 +29,7 @@ class AuthService {
         this.currentUser = null;
         this.authStateCallbacks = [];
         this.isInitialized = false;
+        this.currentRole = 'guest';
         this.initializeService();
     }
 
@@ -56,6 +60,12 @@ class AuthService {
         onAuthStateChanged(auth, (user) => {
             this.currentUser = user;
             console.log('인증 상태 변경:', user ? `로그인됨 (${user.email})` : '로그아웃됨');
+            // 로그인 시 역할 동기화
+            if (user) {
+                this.fetchUserRole().catch(err => console.error('역할 조회 오류:', err));
+            } else {
+                this.currentRole = 'guest';
+            }
             
             // 모든 콜백 함수 호출
             this.authStateCallbacks.forEach(callback => {
@@ -186,6 +196,42 @@ class AuthService {
                 error: '게스트 로그인 중 오류가 발생했습니다.'
             };
         }
+    }
+
+    // 사용자 역할 조회/초기화
+    async fetchUserRole() {
+        try {
+            if (!db || !this.currentUser) {
+                this.currentRole = 'guest';
+                return this.currentRole;
+            }
+            const userRef = doc(db, 'users', this.currentUser.uid);
+            const snap = await getDoc(userRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                this.currentRole = data?.role === 'instructor' ? 'instructor' : 'member';
+                return this.currentRole;
+            }
+            // 기본 역할 결정 (특정 이메일은 강사 승격)
+            const INSTRUCTOR_EMAILS = ['meangyun0729@gmail.com'];
+            const role = INSTRUCTOR_EMAILS.includes(this.currentUser.email) ? 'instructor' : 'member';
+            await setDoc(userRef, {
+                role,
+                email: this.currentUser.email || null,
+                displayName: this.currentUser.displayName || null,
+                createdAt: new Date().toISOString()
+            });
+            this.currentRole = role;
+            return this.currentRole;
+        } catch (error) {
+            console.error('사용자 역할 설정 실패:', error);
+            this.currentRole = 'member';
+            return this.currentRole;
+        }
+    }
+
+    getCurrentRole() {
+        return this.currentRole;
     }
 
     // 로그아웃

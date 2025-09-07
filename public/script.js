@@ -30,6 +30,8 @@ let currentEditElement = null;
 let slideData = new Map(); // 슬라이드 데이터 캐시
 
 // DOM 요소들
+const landingContainer = document.getElementById('landingContainer');
+const presentationContainer = document.getElementById('presentationContainer');
 const slideContainer = document.getElementById('slideContainer');
 const currentPageSpan = document.querySelector('.current-page');
 const totalPagesSpan = document.querySelector('.total-pages');
@@ -61,6 +63,8 @@ const authLogin = document.getElementById('authLogin');
 const authProfile = document.getElementById('authProfile');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const guestLoginBtn = document.getElementById('guestLoginBtn');
+const landingGoogleLoginBtn = document.getElementById('landingGoogleLoginBtn');
+const landingGuestLoginBtn = document.getElementById('landingGuestLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const userAvatar = document.getElementById('userAvatar');
 const userName = document.getElementById('userName');
@@ -71,15 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         console.log('🎯 기획자의 AI 창업 프레젠테이션 초기화 중...');
         
-        // 슬라이드 초기화
-        initializeSlides();
-        updateUI();
-        setupEventListeners();
+        // 초기에 랜딩 표시
+        showLanding();
         
-        // 편집 기능 활성화
-        setupEditingFeatures();
-        
-        // 인증 초기화 (실패 시 로컬 모드로 자동 전환)
+        // 인증 초기화 (성공 시 역할에 따른 프레젠테이션 진입)
         initializeAuth();
         
         // 로컬 데이터 로드
@@ -540,6 +539,17 @@ function setupEventListeners() {
             }
         }
     });
+}
+
+// 랜딩/프레젠테이션 표시
+function showLanding() {
+    if (landingContainer) landingContainer.style.display = 'flex';
+    if (presentationContainer) presentationContainer.style.display = 'none';
+}
+
+function showPresentation() {
+    if (landingContainer) landingContainer.style.display = 'none';
+    if (presentationContainer) presentationContainer.style.display = 'block';
 }
 
 // 키보드 이벤트 처리
@@ -1330,15 +1340,18 @@ function enableLocalMode() {
     // Firebase 모드 플래그 해제
     window.isFirebaseMode = false;
     
-    // 편집 모드 버튼 표시 (로컬 모드에서 사용 가능)
+    // 게스트는 편집 토글 숨김
     if (editModeToggle) {
-        editModeToggle.style.display = 'block';
+        editModeToggle.style.display = 'none';
     }
     
-    // 인증 UI 완전 숨김
+    // 인증 UI는 랜딩에서 처리
     if (authContainer) {
         authContainer.style.display = 'none';
     }
+
+    // 프레젠테이션 보여주기
+    showPresentation();
     
     // 로컬 모드 환영 메시지
     setTimeout(() => {
@@ -1352,10 +1365,16 @@ function setupAuthEventListeners() {
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', handleGoogleLogin);
     }
+    if (landingGoogleLoginBtn) {
+        landingGoogleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
     
     // 게스트 로그인 버튼
     if (guestLoginBtn) {
         guestLoginBtn.addEventListener('click', handleGuestLogin);
+    }
+    if (landingGuestLoginBtn) {
+        landingGuestLoginBtn.addEventListener('click', handleGuestLogin);
     }
     
     // 로그아웃 버튼
@@ -1489,6 +1508,7 @@ function updateAuthUI(user) {
     if (!authLogin || !authProfile) return;
     
     if (user) {
+        showPresentation();
         // 로그인 상태
         authLogin.style.display = 'none';
         authProfile.style.display = 'block';
@@ -1515,6 +1535,7 @@ function updateAuthUI(user) {
         
         window.isFirebaseMode = true;
     } else {
+        showLanding();
         // 로그아웃 상태
         authLogin.style.display = 'block';
         authProfile.style.display = 'none';
@@ -1527,10 +1548,7 @@ function updateAuthUI(user) {
 function updateEditModeAccess(user) {
     if (!editModeToggle) return;
     
-    if (user) {
-        // 로그인된 사용자는 편집 모드 사용 가능
-        editModeToggle.style.display = 'block';
-    } else {
+    if (!user) {
         // 로그아웃된 사용자는 편집 모드 사용 불가
         editModeToggle.style.display = 'none';
         
@@ -1538,6 +1556,22 @@ function updateEditModeAccess(user) {
         if (isEditMode) {
             disableEditMode();
         }
+        return;
+    }
+
+    // 역할 기반 제어
+    try {
+        const role = authService?.getCurrentRole ? authService.getCurrentRole() : 'member';
+        if (role === 'instructor') {
+            editModeToggle.style.display = 'block';
+        } else {
+            editModeToggle.style.display = 'none';
+            if (isEditMode) disableEditMode();
+        }
+    } catch (e) {
+        // 안전 기본값: 비표시
+        editModeToggle.style.display = 'none';
+        if (isEditMode) disableEditMode();
     }
 }
 

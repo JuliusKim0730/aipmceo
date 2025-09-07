@@ -10,8 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- 랜딩 페이지 -->
+    <div class="landing-container" id="landingContainer" style="display: none;">
+        <div class="landing-inner">
+            <h1 class="landing-title">기획자의 AI 창업 - 왜 안하시나요?</h1>
+            <p class="landing-subtitle">시작은 랜딩에서, 이어서 로그인 또는 게스트로 보기</p>
+            <div class="landing-actions">
+                <button class="auth-btn google-login-btn" id="landingGoogleLoginBtn">Google로 로그인</button>
+                <button class="auth-btn guest-login-btn" id="landingGuestLoginBtn">👤 게스트로 둘러보기</button>
+            </div>
+        </div>
+    </div>
     <!-- 프레젠테이션 컨테이너 -->
-    <div class="presentation-container">
+    <div class="presentation-container" id="presentationContainer" style="display: none;">
         <!-- 페이지 넘버링 UI -->
         <div class="page-indicator">
             <span class="current-page">1</span> / <span class="total-pages">80</span>
