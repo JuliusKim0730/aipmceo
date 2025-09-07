@@ -545,11 +545,19 @@ function setupEventListeners() {
 function showLanding() {
     if (landingContainer) landingContainer.style.display = 'flex';
     if (presentationContainer) presentationContainer.style.display = 'none';
+    
+    // 헤더 숨기기
+    const mainHeader = document.getElementById('mainHeader');
+    if (mainHeader) mainHeader.style.display = 'none';
 }
 
 function showPresentation() {
     if (landingContainer) landingContainer.style.display = 'none';
     if (presentationContainer) presentationContainer.style.display = 'block';
+    
+    // 헤더 표시
+    const mainHeader = document.getElementById('mainHeader');
+    if (mainHeader) mainHeader.style.display = 'block';
 }
 
 // 키보드 이벤트 처리

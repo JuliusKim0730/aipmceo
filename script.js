@@ -71,6 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         console.log('🎯 기획자의 AI 창업 프레젠테이션 초기화 중...');
         
+        // 헤더 표시 (바로 프레젠테이션 모드)
+        const mainHeader = document.querySelector('.main-header');
+        if (mainHeader) mainHeader.style.display = 'block';
+        
         // 슬라이드 초기화
         initializeSlides();
         updateUI();

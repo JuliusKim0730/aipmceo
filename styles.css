@@ -13,10 +13,138 @@ body {
     width: 100vw;
 }
 
+/* Main Header */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(36, 59, 122, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-content {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-title h1 {
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.header-btn:active {
+    transform: translateY(0);
+}
+
+/* 헤더 안의 인증 컨테이너 스타일 재정의 */
+.header-controls .auth-container {
+    position: static;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.header-controls .auth-login {
+    display: flex;
+    gap: 8px;
+}
+
+.header-controls .auth-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-controls .auth-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.header-controls .auth-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-controls .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-controls .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-controls .user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-controls .user-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.header-controls .user-email {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+}
+
 /* Presentation Container - 1920x1080 최적화 */
 .presentation-container {
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 60px);
+    margin-top: 60px;
     position: relative;
     display: flex;
     align-items: center;
@@ -24,8 +152,9 @@ body {
     /* 16:9 비율 유지 */
     aspect-ratio: 16/9;
     max-width: 1920px;
-    max-height: 1080px;
-    margin: 0 auto;
+    max-height: calc(1080px - 60px);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Slide Container */
