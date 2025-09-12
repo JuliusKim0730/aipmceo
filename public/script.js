@@ -1688,6 +1688,18 @@ async function handleGoogleLogin() {
     setButtonLoading(googleLoginBtn, true);
     
     try {
+        // Firebase가 사용 불가능한 경우 즉시 로컬 모드로 전환
+        if (!authService || !authService.isInitialized) {
+            console.log('🔄 Firebase 사용 불가 - 로컬 모드로 즉시 전환');
+            showSaveStatus('Firebase 연결 불가 - 로컬 모드로 전환됩니다', 'warning');
+            
+            setTimeout(() => {
+                enableLocalMode();
+                showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
+            }, 1000);
+            return;
+        }
+        
         const result = await authService.signInWithGoogle();
         
         if (result.success) {
@@ -1697,21 +1709,23 @@ async function handleGoogleLogin() {
             console.error('구글 로그인 실패:', result.error);
             
             // Firebase 오류 시 로컬 모드로 자동 전환
-            if (result.fallbackToLocal) {
-                console.log('🔄 Firebase 오류로 인한 로컬 모드 자동 전환');
-                showSaveStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
-                
-                setTimeout(() => {
-                    enableLocalMode();
-                    showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
-                }, 2000);
-            } else {
-                showSaveStatus(result.error, 'error');
-            }
+            console.log('🔄 구글 로그인 실패로 인한 로컬 모드 자동 전환');
+            showSaveStatus('구글 로그인 실패 - 로컬 모드로 전환됩니다', 'warning');
+            
+            setTimeout(() => {
+                enableLocalMode();
+                showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
+            }, 1000);
         }
     } catch (error) {
         console.error('구글 로그인 오류:', error);
-        showSaveStatus('로그인 중 오류가 발생했습니다.', 'error');
+        console.log('🔄 구글 로그인 오류로 인한 로컬 모드 자동 전환');
+        showSaveStatus('로그인 오류 - 로컬 모드로 전환됩니다', 'warning');
+        
+        setTimeout(() => {
+            enableLocalMode();
+            showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
+        }, 1000);
     } finally {
         setButtonLoading(googleLoginBtn, false);
     }
@@ -1728,6 +1742,18 @@ async function handleGuestLogin() {
     setButtonLoading(guestLoginBtn, true);
     
     try {
+        // Firebase가 사용 불가능한 경우 즉시 로컬 모드로 전환
+        if (!authService || !authService.isInitialized) {
+            console.log('🔄 Firebase 사용 불가 - 로컬 게스트 모드로 즉시 전환');
+            showSaveStatus('Firebase 연결 불가 - 로컬 모드로 전환됩니다', 'warning');
+            
+            setTimeout(() => {
+                enableLocalMode();
+                showSaveStatus('로컬 게스트 모드가 활성화되었습니다', 'saved');
+            }, 1000);
+            return;
+        }
+        
         const result = await authService.signInAnonymously();
         
         if (result.success) {
@@ -1737,21 +1763,23 @@ async function handleGuestLogin() {
             console.error('게스트 로그인 실패:', result.error);
             
             // Firebase 오류 시 로컬 모드로 자동 전환
-            if (result.fallbackToLocal) {
-                console.log('🔄 Firebase 오류로 인한 로컬 모드 자동 전환');
-                showSaveStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
-                
-                setTimeout(() => {
-                    enableLocalMode();
-                    showSaveStatus('로컬 게스트 모드가 활성화되었습니다', 'saved');
-                }, 2000);
-            } else {
-                showSaveStatus(result.error, 'error');
-            }
+            console.log('🔄 게스트 로그인 실패로 인한 로컬 모드 자동 전환');
+            showSaveStatus('게스트 로그인 실패 - 로컬 모드로 전환됩니다', 'warning');
+            
+            setTimeout(() => {
+                enableLocalMode();
+                showSaveStatus('로컬 게스트 모드가 활성화되었습니다', 'saved');
+            }, 1000);
         }
     } catch (error) {
         console.error('게스트 로그인 오류:', error);
-        showSaveStatus('게스트 로그인 중 오류가 발생했습니다.', 'error');
+        console.log('🔄 게스트 로그인 오류로 인한 로컬 모드 자동 전환');
+        showSaveStatus('게스트 로그인 오류 - 로컬 모드로 전환됩니다', 'warning');
+        
+        setTimeout(() => {
+            enableLocalMode();
+            showSaveStatus('로컬 게스트 모드가 활성화되었습니다', 'saved');
+        }, 1000);
     } finally {
         setButtonLoading(guestLoginBtn, false);
     }

@@ -487,6 +487,20 @@ class Header {
         window.isExplicitLogin = true;
 
         try {
+            // Firebase가 사용 불가능한 경우 즉시 로컬 모드로 전환
+            if (!window.authService || !window.authService.isInitialized) {
+                console.log('🔄 Header: Firebase 사용 불가 - 로컬 모드로 즉시 전환');
+                this.showStatus('Firebase 연결 불가 - 로컬 모드로 전환됩니다', 'warning');
+                
+                setTimeout(() => {
+                    if (window.enableLocalMode) {
+                        window.enableLocalMode();
+                        this.showStatus('로컬 모드가 활성화되었습니다', 'success');
+                    }
+                }, 1000);
+                return;
+            }
+            
             // 전역 인증 서비스 사용
             if (window.authService && window.authService.signInWithGoogle) {
                 const result = await window.authService.signInWithGoogle();
@@ -495,22 +509,27 @@ class Header {
                     this.showStatus('로그인 성공!', 'success');
                 } else {
                     // Firebase 오류 시 로컬 모드로 자동 전환
-                    if (result.fallbackToLocal) {
-                        console.log('🔄 Header: Firebase 오류로 인한 로컬 모드 자동 전환');
-                        this.showStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
-                        
-                        setTimeout(() => {
-                            if (window.enableLocalMode) {
-                                window.enableLocalMode();
-                                this.showStatus('로컬 모드가 활성화되었습니다', 'success');
-                            }
-                        }, 2000);
-                    } else {
-                        this.showStatus('로그인 실패: ' + result.error, 'error');
-                    }
+                    console.log('🔄 Header: 구글 로그인 실패로 인한 로컬 모드 자동 전환');
+                    this.showStatus('구글 로그인 실패 - 로컬 모드로 전환됩니다', 'warning');
+                    
+                    setTimeout(() => {
+                        if (window.enableLocalMode) {
+                            window.enableLocalMode();
+                            this.showStatus('로컬 모드가 활성화되었습니다', 'success');
+                        }
+                    }, 1000);
                 }
             } else {
-                this.showStatus('인증 서비스가 사용할 수 없습니다.', 'error');
+                // 로컬 모드로 즉시 전환
+                console.log('🔄 Header: 인증 서비스 없음 - 로컬 모드로 전환');
+                this.showStatus('로컬 모드로 전환됩니다', 'warning');
+                
+                setTimeout(() => {
+                    if (window.enableLocalMode) {
+                        window.enableLocalMode();
+                        this.showStatus('로컬 모드가 활성화되었습니다', 'success');
+                    }
+                }, 1000);
             }
         } catch (error) {
             console.error('구글 로그인 오류:', error);
@@ -529,6 +548,20 @@ class Header {
         window.isExplicitLogin = true;
 
         try {
+            // Firebase가 사용 불가능한 경우 즉시 로컬 모드로 전환
+            if (!window.authService || !window.authService.isInitialized) {
+                console.log('🔄 Header: Firebase 사용 불가 - 로컬 게스트 모드로 즉시 전환');
+                this.showStatus('Firebase 연결 불가 - 로컬 모드로 전환됩니다', 'warning');
+                
+                setTimeout(() => {
+                    if (window.enableLocalMode) {
+                        window.enableLocalMode();
+                        this.showStatus('로컬 게스트 모드가 활성화되었습니다', 'success');
+                    }
+                }, 1000);
+                return;
+            }
+            
             if (window.authService && window.authService.signInAnonymously) {
                 const result = await window.authService.signInAnonymously();
                 if (result.success) {
@@ -536,19 +569,15 @@ class Header {
                     this.showStatus('게스트로 로그인했습니다.', 'success');
                 } else {
                     // Firebase 오류 시 로컬 모드로 자동 전환
-                    if (result.fallbackToLocal) {
-                        console.log('🔄 Header: Firebase 오류로 인한 로컬 게스트 모드 자동 전환');
-                        this.showStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
-                        
-                        setTimeout(() => {
-                            if (window.enableLocalMode) {
-                                window.enableLocalMode();
-                                this.showStatus('로컬 게스트 모드가 활성화되었습니다', 'success');
-                            }
-                        }, 2000);
-                    } else {
-                        this.showStatus('게스트 로그인 실패: ' + result.error, 'error');
-                    }
+                    console.log('🔄 Header: 게스트 로그인 실패로 인한 로컬 모드 자동 전환');
+                    this.showStatus('게스트 로그인 실패 - 로컬 모드로 전환됩니다', 'warning');
+                    
+                    setTimeout(() => {
+                        if (window.enableLocalMode) {
+                            window.enableLocalMode();
+                            this.showStatus('로컬 게스트 모드가 활성화되었습니다', 'success');
+                        }
+                    }, 1000);
                 }
             } else {
                 // 로컬 게스트 모드
@@ -598,31 +627,51 @@ class Header {
     async performLogout() {
         console.log('🚪 로그아웃 수행 시작');
         
-        // 편집 모드 비활성화
-        if (this.isEditMode) {
-            this.toggleEditMode();
+        try {
+            // 편집 모드 비활성화
+            if (this.isEditMode) {
+                console.log('📝 편집 모드 비활성화');
+                this.toggleEditMode();
+            }
+            
+            // 드롭다운 닫기
+            console.log('🔽 드롭다운 메뉴 닫기');
+            this.closeDropdown();
+            
+            // 명시적 로그인 플래그 초기화
+            window.isExplicitLogin = false;
+            console.log('🔄 명시적 로그인 플래그 초기화');
+            
+            // 사용자 정보 초기화
+            console.log('👤 사용자 정보 초기화');
+            this.updateAuthUI(null);
+            
+            // 페이지 상태 강제 초기화
+            setTimeout(() => {
+                // 메인 화면(랜딩 페이지)으로 이동
+                if (typeof showLanding === 'function') {
+                    console.log('🏠 showLanding() 함수 호출');
+                    showLanding();
+                } else if (window.showLanding) {
+                    console.log('🏠 window.showLanding() 호출');
+                    window.showLanding();
+                } else {
+                    console.warn('showLanding 함수를 찾을 수 없음 - 페이지 새로고침으로 강제 초기화');
+                    window.location.reload();
+                }
+            }, 100);
+            
+            this.showStatus('로그아웃되었습니다.', 'success');
+            console.log('✅ 로그아웃 완료');
+            
+        } catch (error) {
+            console.error('로그아웃 수행 중 오류:', error);
+            // 오류가 발생해도 강제로 페이지를 초기화
+            console.log('⚠️ 오류 발생으로 인한 강제 페이지 새로고침');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
-        
-        // 드롭다운 닫기
-        this.closeDropdown();
-        
-        // 사용자 정보 초기화
-        this.updateAuthUI(null);
-        
-        // 메인 화면(랜딩 페이지)으로 이동
-        if (typeof showLanding === 'function') {
-            console.log('🏠 랜딩 페이지로 이동');
-            showLanding();
-        } else if (window.showLanding) {
-            console.log('🏠 window.showLanding 호출');
-            window.showLanding();
-        } else {
-            console.warn('showLanding 함수를 찾을 수 없음 - 페이지 새로고침');
-            window.location.reload();
-        }
-        
-        this.showStatus('로그아웃되었습니다.', 'success');
-        console.log('✅ 로그아웃 완료');
     }
 
     // 전체화면 토글
