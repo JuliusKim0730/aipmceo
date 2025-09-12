@@ -10,7 +10,13 @@ class Header {
     // Header 초기화
     initializeHeader() {
         this.createHeaderHTML();
-        this.bindEvents();
+        
+        // DOM 요소가 생성된 후 이벤트 바인딩
+        setTimeout(() => {
+            this.bindEvents();
+            this.debugDOMElements();
+        }, 100);
+        
         console.log('✅ Header 컴포넌트 초기화 완료');
     }
 
@@ -221,13 +227,39 @@ class Header {
             logoutBtn.addEventListener('click', () => this.handleLogout());
         }
 
-        // 사용자 드롭다운 이벤트
+        // 사용자 드롭다운 이벤트 - 강화된 바인딩
         const userDropdownTrigger = document.getElementById('userDropdownTrigger');
+        console.log('🎯 드롭다운 트리거 요소:', userDropdownTrigger);
+        
         if (userDropdownTrigger) {
+            console.log('✅ 드롭다운 트리거 발견 - 이벤트 바인딩');
+            
+            // 클릭 이벤트
             userDropdownTrigger.addEventListener('click', (e) => {
+                console.log('🖱️ 드롭다운 트리거 클릭됨!');
+                e.preventDefault();
                 e.stopPropagation();
                 this.toggleDropdown();
             });
+            
+            // 터치 이벤트 (모바일 지원)
+            userDropdownTrigger.addEventListener('touchend', (e) => {
+                console.log('👆 드롭다운 트리거 터치됨!');
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleDropdown();
+            });
+            
+            // 포커스 이벤트 (키보드 접근성)
+            userDropdownTrigger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    console.log('⌨️ 드롭다운 트리거 키보드 활성화!');
+                    e.preventDefault();
+                    this.toggleDropdown();
+                }
+            });
+        } else {
+            console.error('❌ 드롭다운 트리거 요소를 찾을 수 없음');
         }
 
         // 드롭다운 메뉴 항목들
@@ -265,6 +297,58 @@ class Header {
                 this.closeDropdown();
             }
         });
+        
+        // 추가적인 이벤트 위임 방식 (백업)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#userDropdownTrigger')) {
+                console.log('🎯 이벤트 위임으로 드롭다운 트리거 감지!');
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleDropdown();
+            }
+        });
+        
+        // 헤더 전체에서 사용자 드롭다운 관련 클릭 감지
+        const headerElement = document.querySelector('.modern-header');
+        if (headerElement) {
+            headerElement.addEventListener('click', (e) => {
+                console.log('🏠 헤더 클릭 감지:', e.target);
+                
+                // 드롭다운 트리거나 그 하위 요소 클릭 시
+                if (e.target.closest('.user-dropdown-trigger')) {
+                    console.log('🎯 헤더에서 드롭다운 트리거 감지!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleDropdown();
+                }
+            });
+        }
+    }
+
+    // DOM 요소 디버깅
+    debugDOMElements() {
+        console.log('🔍 DOM 요소 디버깅 시작');
+        
+        const elements = {
+            userDropdownTrigger: document.getElementById('userDropdownTrigger'),
+            userDropdownMenu: document.getElementById('userDropdownMenu'),
+            userName: document.getElementById('userName'),
+            userAvatar: document.getElementById('userAvatar'),
+            authProfile: document.getElementById('authProfile')
+        };
+        
+        Object.entries(elements).forEach(([name, element]) => {
+            if (element) {
+                console.log(`✅ ${name}:`, element);
+                console.log(`   - 클래스:`, element.className);
+                console.log(`   - 스타일:`, element.style.display);
+                console.log(`   - 이벤트:`, element.onclick ? '있음' : '없음');
+            } else {
+                console.error(`❌ ${name}: 요소를 찾을 수 없음`);
+            }
+        });
+        
+        console.log('🔍 DOM 요소 디버깅 완료');
     }
 
     // 드롭다운 토글
