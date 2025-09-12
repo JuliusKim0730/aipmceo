@@ -273,12 +273,19 @@ class Header {
         const dropdownArrow = document.querySelector('.dropdown-arrow');
         
         if (dropdownMenu) {
-            const isVisible = dropdownMenu.style.display !== 'none';
-            dropdownMenu.style.display = isVisible ? 'none' : 'block';
+            const isVisible = dropdownMenu.style.display !== 'none' && dropdownMenu.style.display !== '';
             
-            if (dropdownArrow) {
-                dropdownArrow.textContent = isVisible ? '▼' : '▲';
+            if (isVisible) {
+                dropdownMenu.style.display = 'none';
+                if (dropdownArrow) dropdownArrow.textContent = '▼';
+                console.log('🔽 드롭다운 닫힘');
+            } else {
+                dropdownMenu.style.display = 'block';
+                if (dropdownArrow) dropdownArrow.textContent = '▲';
+                console.log('🔼 드롭다운 열림');
             }
+        } else {
+            console.error('❌ 드롭다운 메뉴를 찾을 수 없음');
         }
     }
 

@@ -80,7 +80,6 @@ const googleLoginBtn = document.getElementById('googleLoginBtn');
 const guestLoginBtn = document.getElementById('guestLoginBtn');
 const landingGoogleLoginBtn = document.getElementById('landingGoogleLoginBtn');
 const landingGuestLoginBtn = document.getElementById('landingGuestLoginBtn');
-const localModeBtn = document.getElementById('localModeBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const userAvatar = document.getElementById('userAvatar');
 const userName = document.getElementById('userName');
@@ -1643,10 +1642,6 @@ function setupAuthEventListeners() {
         landingGuestLoginBtn.addEventListener('click', handleGuestLogin);
     }
     
-    // 바로 시작하기 버튼 (로컬 모드)
-    if (localModeBtn) {
-        localModeBtn.addEventListener('click', forceEnableLocalMode);
-    }
     
     // 로그아웃 버튼
     if (logoutBtn) {
@@ -1654,32 +1649,6 @@ function setupAuthEventListeners() {
     }
 }
 
-// 강제로 로컬 모드 활성화
-function forceEnableLocalMode() {
-    console.log('🚀 바로 시작하기 - 로컬 모드 강제 활성화');
-    
-    // 가짜 게스트 사용자 생성
-    const guestUser = {
-        displayName: '게스트 사용자',
-        email: null,
-        photoURL: null,
-        isAnonymous: true,
-        uid: 'local-guest-' + Date.now()
-    };
-    
-    // 프레젠테이션 즉시 표시
-    showPresentation();
-    
-    // 헤더 업데이트
-    if (window.headerInstance) {
-        window.headerInstance.updateAuthUI(guestUser);
-    }
-    
-    // 편집 모드 활성화
-    enableLocalMode();
-    
-    console.log('✅ 로컬 모드 강제 활성화 완료');
-}
 
 // 구글 로그인 처리
 async function handleGoogleLogin() {

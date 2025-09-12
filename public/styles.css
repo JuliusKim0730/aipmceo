@@ -817,10 +817,12 @@ body {
 
 /* 새로운 슬라이드 레이아웃 스타일들 */
 .journey-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     padding: 20px;
+    width: 100%;
+    min-height: 400px;
 }
 
 .journey-item {
