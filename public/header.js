@@ -65,11 +65,6 @@ class Header {
 
                     <!-- 우측 컨트롤들 -->
                     <div class="header-right">
-                        <!-- 편집 모드 토글 -->
-                        <button class="edit-mode-btn" id="editModeBtn" title="편집 모드 토글">
-                            <span class="edit-icon">📝</span>
-                            <span class="edit-text">편집 모드</span>
-                        </button>
 
                         <!-- 사용자 정보 / 로그인 -->
                         <div class="auth-section" id="authSection">
@@ -92,25 +87,44 @@ class Header {
 
                             <!-- 로그인 후 -->
                             <div class="auth-profile" id="authProfile" style="display: none;">
-                                <img class="user-avatar" id="userAvatar" src="" alt="프로필">
-                                <div class="user-info-compact">
-                                    <span class="user-name-compact" id="userName">사용자</span>
-                                    <span class="user-email-compact" id="userEmail">user@example.com</span>
+                                <div class="user-dropdown">
+                                    <button class="user-dropdown-trigger" id="userDropdownTrigger">
+                                        <img class="user-avatar" id="userAvatar" src="" alt="프로필">
+                                        <span class="user-name-display" id="userName">사용자</span>
+                                        <span class="dropdown-arrow">▼</span>
+                                    </button>
+                                    <div class="user-dropdown-menu" id="userDropdownMenu" style="display: none;">
+                                        <div class="dropdown-header">
+                                            <img class="dropdown-avatar" id="dropdownAvatar" src="" alt="프로필">
+                                            <div class="dropdown-user-info">
+                                                <span class="dropdown-user-name" id="dropdownUserName">사용자</span>
+                                                <span class="dropdown-user-email" id="dropdownUserEmail">user@example.com</span>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <div class="dropdown-items">
+                                            <button class="dropdown-item" id="editModeToggle">
+                                                <span class="dropdown-icon">📝</span>
+                                                <span class="dropdown-text">편집 모드</span>
+                                                <span class="dropdown-status" id="editModeStatus">OFF</span>
+                                            </button>
+                                            <button class="dropdown-item" id="fullscreenToggle">
+                                                <span class="dropdown-icon">⛶</span>
+                                                <span class="dropdown-text">전체화면</span>
+                                            </button>
+                                            <button class="dropdown-item" id="helpToggle">
+                                                <span class="dropdown-icon">❓</span>
+                                                <span class="dropdown-text">도움말</span>
+                                            </button>
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="dropdown-item logout-item" id="logoutBtn">
+                                            <span class="dropdown-icon">🚪</span>
+                                            <span class="dropdown-text">로그아웃</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <button class="logout-btn-compact" id="logoutBtn" title="로그아웃">
-                                    <span class="logout-icon">🚪</span>
-                                </button>
                             </div>
-                        </div>
-
-                        <!-- 추가 컨트롤들 -->
-                        <div class="header-controls">
-                            <button class="control-btn fullscreen-btn" id="fullscreenBtn" title="전체화면 (F)">
-                                <span class="fullscreen-icon">⛶</span>
-                            </button>
-                            <button class="control-btn help-btn" id="helpBtn" title="키보드 단축키 (H)">
-                                <span class="help-icon">❓</span>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -207,41 +221,97 @@ class Header {
             logoutBtn.addEventListener('click', () => this.handleLogout());
         }
 
-        // 컨트롤 버튼들
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const helpBtn = document.getElementById('helpBtn');
+        // 사용자 드롭다운 이벤트
+        const userDropdownTrigger = document.getElementById('userDropdownTrigger');
+        if (userDropdownTrigger) {
+            userDropdownTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleDropdown();
+            });
+        }
 
-        if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+        // 드롭다운 메뉴 항목들
+        const editModeToggle = document.getElementById('editModeToggle');
+        const fullscreenToggle = document.getElementById('fullscreenToggle');
+        const helpToggle = document.getElementById('helpToggle');
+
+        if (editModeToggle) {
+            editModeToggle.addEventListener('click', () => {
+                this.toggleEditMode();
+                this.closeDropdown();
+            });
+        }
+
+        if (fullscreenToggle) {
+            fullscreenToggle.addEventListener('click', () => {
+                this.toggleFullscreen();
+                this.closeDropdown();
+            });
+        }
+
+        if (helpToggle) {
+            helpToggle.addEventListener('click', () => {
+                this.toggleHelp();
+                this.closeDropdown();
+            });
+        }
+
+        // 드롭다운 외부 클릭 시 닫기
+        document.addEventListener('click', (e) => {
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+            const userDropdown = document.querySelector('.user-dropdown');
+            
+            if (dropdownMenu && userDropdown && !userDropdown.contains(e.target)) {
+                this.closeDropdown();
+            }
+        });
+    }
+
+    // 드롭다운 토글
+    toggleDropdown() {
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+        
+        if (dropdownMenu) {
+            const isVisible = dropdownMenu.style.display !== 'none';
+            dropdownMenu.style.display = isVisible ? 'none' : 'block';
+            
+            if (dropdownArrow) {
+                dropdownArrow.textContent = isVisible ? '▼' : '▲';
+            }
+        }
+    }
+
+    // 드롭다운 닫기
+    closeDropdown() {
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+        
+        if (dropdownMenu) {
+            dropdownMenu.style.display = 'none';
         }
         
-        if (helpBtn) {
-            helpBtn.addEventListener('click', () => this.toggleHelp());
+        if (dropdownArrow) {
+            dropdownArrow.textContent = '▼';
         }
     }
 
     // 편집 모드 토글
     toggleEditMode() {
         this.isEditMode = !this.isEditMode;
-        const editModeBtn = document.getElementById('editModeBtn');
-        const editIcon = editModeBtn?.querySelector('.edit-icon');
-        const editText = editModeBtn?.querySelector('.edit-text');
+        const editModeStatus = document.getElementById('editModeStatus');
 
         if (this.isEditMode) {
-            editModeBtn?.classList.add('active');
-            if (editIcon) editIcon.textContent = '🔒';
-            if (editText) editText.textContent = '편집 완료';
             document.body.classList.add('edit-mode');
+            if (editModeStatus) editModeStatus.textContent = 'ON';
             
             // 전역 편집 모드 함수 호출 (기존 script.js의 함수)
             if (window.enableEditMode) {
                 window.enableEditMode();
             }
         } else {
-            editModeBtn?.classList.remove('active');
-            if (editIcon) editIcon.textContent = '📝';
-            if (editText) editText.textContent = '편집 모드';
             document.body.classList.remove('edit-mode');
+            if (editModeStatus) editModeStatus.textContent = 'OFF';
             
             // 전역 편집 모드 함수 호출 (기존 script.js의 함수)
             if (window.disableEditMode) {
@@ -377,7 +447,9 @@ class Header {
         const authProfile = document.getElementById('authProfile');
         const userAvatar = document.getElementById('userAvatar');
         const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
+        const dropdownAvatar = document.getElementById('dropdownAvatar');
+        const dropdownUserName = document.getElementById('dropdownUserName');
+        const dropdownUserEmail = document.getElementById('dropdownUserEmail');
 
         if (user) {
             console.log('Header: 로그인 상태 - 프레젠테이션 표시 시도');
@@ -399,24 +471,32 @@ class Header {
                 console.log('Header: authProfile 표시');
             }
 
-            // 사용자 정보 표시
+            // 사용자 역할 확인
+            const role = this.getUserRole(user);
+            const roleEmoji = role === 'instructor' ? '👨‍🏫' : role === 'student' ? '👨‍🎓' : '👤';
+            const roleName = role === 'instructor' ? '강사' : role === 'student' ? '학생' : '게스트';
+            const displayName = user.displayName || roleName;
+
+            // 트리거 버튼 사용자 정보 (간단히 표시)
             if (userName) {
-                const role = this.getUserRole(user);
-                const roleEmoji = role === 'instructor' ? '👨‍🏫' : role === 'student' ? '👨‍🎓' : '👤';
-                const roleName = role === 'instructor' ? '강사' : role === 'student' ? '학생' : '게스트';
-                userName.textContent = `${roleEmoji} ${user.displayName || roleName}`;
+                userName.textContent = displayName;
             }
 
-            if (userEmail) {
-                userEmail.textContent = user.email || (user.isAnonymous ? '게스트 사용자' : '이메일 없음');
-            }
-
+            // 아바타 설정
+            const avatarSrc = (user.photoURL && !user.isAnonymous) ? user.photoURL : this.getDefaultAvatar();
             if (userAvatar) {
-                if (user.photoURL && !user.isAnonymous) {
-                    userAvatar.src = user.photoURL;
-                } else {
-                    userAvatar.src = this.getDefaultAvatar();
-                }
+                userAvatar.src = avatarSrc;
+            }
+
+            // 드롭다운 내부 사용자 정보 (상세히 표시)
+            if (dropdownAvatar) {
+                dropdownAvatar.src = avatarSrc;
+            }
+            if (dropdownUserName) {
+                dropdownUserName.textContent = `${roleEmoji} ${displayName}`;
+            }
+            if (dropdownUserEmail) {
+                dropdownUserEmail.textContent = user.email || (user.isAnonymous ? '게스트 사용자' : '이메일 없음');
             }
 
             // 편집 모드 권한 업데이트
@@ -428,31 +508,28 @@ class Header {
             if (authLogin) authLogin.style.display = 'flex';
             if (authProfile) authProfile.style.display = 'none';
             
-            this.currentUser = null;
+            // 드롭다운 닫기
+            this.closeDropdown();
             
-            // 편집 모드 비활성화
-            const editModeBtn = document.getElementById('editModeBtn');
-            if (editModeBtn) {
-                editModeBtn.style.display = 'none';
-            }
+            this.currentUser = null;
         }
     }
 
     // 편집 모드 접근 권한 업데이트
     updateEditModeAccess(user) {
-        const editModeBtn = document.getElementById('editModeBtn');
-        if (!editModeBtn) return;
+        const editModeToggle = document.getElementById('editModeToggle');
+        if (!editModeToggle) return;
 
         const userRole = this.getUserRole(user);
 
         if (userRole === 'instructor') {
             // 강사는 편집 가능
-            editModeBtn.style.display = 'flex';
-            editModeBtn.disabled = false;
+            editModeToggle.style.display = 'flex';
+            editModeToggle.disabled = false;
         } else {
             // 학생과 게스트는 편집 불가능  
-            editModeBtn.style.display = 'none';
-            editModeBtn.disabled = true;
+            editModeToggle.style.display = 'none';
+            editModeToggle.disabled = true;
             
             // 편집 모드가 활성화되어 있다면 비활성화
             if (this.isEditMode) {

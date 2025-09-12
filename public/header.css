@@ -359,18 +359,172 @@
     font-weight: 500;
 }
 
-/* 로그인 후 프로필 - 컴팩트 버전 */
+/* 로그인 후 프로필 - 드롭다운 버전 */
 .auth-profile {
     display: flex;
     align-items: center;
-    gap: 4px;
+    position: relative;
+    min-height: 32px;
+}
+
+/* User Dropdown */
+.user-dropdown {
+    position: relative;
+}
+
+.user-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.user-dropdown-trigger:hover {
     background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 3px 4px;
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-    max-width: 200px;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-name-display {
+    font-weight: 500;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+    margin-left: 4px;
+}
+
+/* Dropdown Menu */
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 280px;
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* Dropdown Header */
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dropdown-user-name {
+    display: block;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-user-email {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dropdown Divider */
+.dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0;
+}
+
+/* Dropdown Items */
+.dropdown-items {
+    padding: 8px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item.logout-item {
+    color: #ff6b6b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 4px;
+}
+
+.dropdown-item.logout-item:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.dropdown-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dropdown-text {
+    flex: 1;
+    font-weight: 500;
+}
+
+.dropdown-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
 }
 
 .user-avatar {
@@ -667,8 +821,17 @@
         height: 24px;
     }
     
-    .auth-profile {
-        max-width: 180px;
+    .user-dropdown-trigger {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .user-name-display {
+        max-width: 80px;
+    }
+    
+    .user-dropdown-menu {
+        min-width: 240px;
     }
     
     .user-name {
@@ -751,8 +914,18 @@
         height: 22px;
     }
     
-    .auth-profile {
-        max-width: 120px;
+    .user-dropdown-trigger {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+    
+    .user-name-display {
+        max-width: 60px;
+    }
+    
+    .user-dropdown-menu {
+        min-width: 200px;
+        margin-top: 4px;
     }
     
     .user-details {
