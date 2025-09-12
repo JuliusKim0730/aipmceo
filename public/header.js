@@ -390,24 +390,13 @@ class Header {
             if (window.authService && window.authService.signOut) {
                 const result = await window.authService.signOut();
                 if (result.success) {
-                    this.updateAuthUI(null);
-                    this.showStatus('로그아웃되었습니다.', 'success');
-                    
-                    // 편집 모드 비활성화
-                    if (this.isEditMode) {
-                        this.toggleEditMode();
-                    }
+                    await this.performLogout();
                 } else {
                     this.showStatus('로그아웃 실패: ' + result.error, 'error');
                 }
             } else {
                 // 로컬 로그아웃
-                this.updateAuthUI(null);
-                this.showStatus('로그아웃되었습니다.', 'success');
-                
-                if (this.isEditMode) {
-                    this.toggleEditMode();
-                }
+                await this.performLogout();
             }
         } catch (error) {
             console.error('로그아웃 오류:', error);
@@ -415,6 +404,37 @@ class Header {
         } finally {
             this.setButtonLoading(logoutBtn, false);
         }
+    }
+
+    // 로그아웃 수행
+    async performLogout() {
+        console.log('🚪 로그아웃 수행 시작');
+        
+        // 편집 모드 비활성화
+        if (this.isEditMode) {
+            this.toggleEditMode();
+        }
+        
+        // 드롭다운 닫기
+        this.closeDropdown();
+        
+        // 사용자 정보 초기화
+        this.updateAuthUI(null);
+        
+        // 메인 화면(랜딩 페이지)으로 이동
+        if (typeof showLanding === 'function') {
+            console.log('🏠 랜딩 페이지로 이동');
+            showLanding();
+        } else if (window.showLanding) {
+            console.log('🏠 window.showLanding 호출');
+            window.showLanding();
+        } else {
+            console.warn('showLanding 함수를 찾을 수 없음 - 페이지 새로고침');
+            window.location.reload();
+        }
+        
+        this.showStatus('로그아웃되었습니다.', 'success');
+        console.log('✅ 로그아웃 완료');
     }
 
     // 전체화면 토글

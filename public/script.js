@@ -1134,7 +1134,9 @@ function addEditButtonsToCurrentSlide() {
     const currentSlide = slides[currentPage - 1];
     if (!currentSlide) return;
     
-    // 통일된 구조의 편집 가능한 영역들에 편집 버튼 추가
+    console.log('🎨 편집 버튼 추가 - 슬라이드', currentPage);
+    
+    // 1. 기존 data-field 방식 지원
     const editableFields = currentSlide.querySelectorAll('[data-field]');
     editableFields.forEach(element => {
         if (!element.querySelector('.edit-button')) {
@@ -1146,6 +1148,48 @@ function addEditButtonsToCurrentSlide() {
             }
         }
     });
+    
+    // 2. 모든 텍스트 영역에 편집 버튼 추가
+    const textElements = currentSlide.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div.slide-title, div.content, div.slide-content, div.subtitle, div.main-text, div.bottom-text');
+    textElements.forEach(element => {
+        // 이미 편집 버튼이 있거나, 헤더 요소이거나, 빈 요소는 제외
+        if (element.querySelector('.edit-button') || 
+            element.closest('.modern-header') || 
+            element.classList.contains('edit-button') ||
+            element.textContent.trim() === '') {
+            return;
+        }
+        
+        // 인라인 편집 가능하게 만들기
+        if (!element.hasAttribute('data-field')) {
+            element.setAttribute('data-field', 'text');
+        }
+        
+        addEditButton(element, 'text');
+    });
+    
+    // 3. 모든 이미지 영역에 편집 버튼 추가
+    const imageElements = currentSlide.querySelectorAll('.slide-image, .empty-content, img');
+    imageElements.forEach(element => {
+        if (element.querySelector('.edit-button') || 
+            element.closest('.modern-header') ||
+            element.classList.contains('edit-button')) {
+            return;
+        }
+        
+        // 이미지 컨테이너에 편집 버튼 추가
+        const imageContainer = element.tagName === 'IMG' ? element.parentElement : element;
+        
+        if (!imageContainer.hasAttribute('data-field')) {
+            imageContainer.setAttribute('data-field', 'image');
+        }
+        
+        if (!imageContainer.querySelector('.edit-button')) {
+            addEditButton(imageContainer, 'image');
+        }
+    });
+    
+    console.log('✅ 편집 버튼 추가 완료');
     
     // 기존 구조의 요소들도 지원 (하위 호환성)
     const legacyTextElements = currentSlide.querySelectorAll('h1, h2, h3, p, .subtitle, .main-title');

@@ -2477,47 +2477,101 @@ body {
 /* 편집 버튼 스타일 */
 .edit-button {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(26, 188, 156, 0.9);
+    top: 8px;
+    right: 8px;
+    background: rgba(26, 188, 156, 0.95);
     color: white;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     display: none;
-    z-index: 1000;
-    transition: all 0.3s ease;
+    z-index: 1001;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .edit-button:hover {
     background: #1ABC9C;
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 1);
 }
 
-.editable:hover .edit-button {
+.edit-button:active {
+    transform: scale(0.95);
+}
+
+/* 편집 모드에서 항상 표시 */
+.edit-mode .edit-button {
     display: block;
+    opacity: 0.7;
+}
+
+.edit-mode .editable:hover .edit-button {
+    opacity: 1;
+}
+
+/* 텍스트 편집 버튼 */
+.text-editable .edit-button {
+    background: rgba(52, 152, 219, 0.95);
+}
+
+.text-editable .edit-button:hover {
+    background: #3498db;
+}
+
+/* 이미지 편집 버튼 */
+.image-editable .edit-button {
+    background: rgba(231, 76, 60, 0.95);
+}
+
+.image-editable .edit-button:hover {
+    background: #e74c3c;
 }
 
 /* 편집 가능한 요소 스타일 */
 .editable {
     position: relative;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    border-radius: 6px;
 }
 
-.editable:hover {
-    background: rgba(26, 188, 156, 0.1);
-    border-radius: 5px;
+.edit-mode .editable {
+    min-height: 24px;
+    border: 1px solid transparent;
 }
 
-.editable.text-editable:hover {
-    outline: 2px dashed rgba(26, 188, 156, 0.5);
+.edit-mode .editable:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
-.editable.image-editable:hover {
-    outline: 2px dashed rgba(231, 76, 60, 0.5);
+.edit-mode .editable.text-editable:hover {
+    border-color: rgba(52, 152, 219, 0.6);
+    background: rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.3);
+}
+
+.edit-mode .editable.image-editable:hover {
+    border-color: rgba(231, 76, 60, 0.6);
+    background: rgba(231, 76, 60, 0.1);
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.3);
+}
+
+/* 편집 가능한 요소에 커서 표시 */
+.edit-mode .editable.text-editable {
+    cursor: text;
+}
+
+.edit-mode .editable.image-editable {
+    cursor: pointer;
 }
 
 /* 텍스트 편집 모달 */
