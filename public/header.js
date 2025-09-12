@@ -380,13 +380,24 @@ class Header {
         const userEmail = document.getElementById('userEmail');
 
         if (user) {
+            console.log('Header: 로그인 상태 - 프레젠테이션 표시 시도');
+            
             // 로그인 상태 - 프레젠테이션 표시
             if (typeof showPresentation === 'function') {
+                console.log('Header: showPresentation 함수 호출');
                 showPresentation();
+            } else {
+                console.error('Header: showPresentation 함수를 찾을 수 없음');
             }
             
-            if (authLogin) authLogin.style.display = 'none';
-            if (authProfile) authProfile.style.display = 'flex';
+            if (authLogin) {
+                authLogin.style.display = 'none';
+                console.log('Header: authLogin 숨김');
+            }
+            if (authProfile) {
+                authProfile.style.display = 'flex';
+                console.log('Header: authProfile 표시');
+            }
 
             // 사용자 정보 표시
             if (userName) {

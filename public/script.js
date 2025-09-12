@@ -625,8 +625,17 @@ function setupEventListeners() {
 
 // 랜딩/프레젠테이션 표시
 function showLanding() {
-    if (landingContainer) landingContainer.style.display = 'flex';
-    if (presentationContainer) presentationContainer.style.display = 'none';
+    console.log('showLanding 호출됨');
+    console.log('landingContainer:', !!landingContainer, 'presentationContainer:', !!presentationContainer);
+    
+    if (landingContainer) {
+        landingContainer.style.display = 'flex';
+        console.log('랜딩 컨테이너 표시됨');
+    }
+    if (presentationContainer) {
+        presentationContainer.style.display = 'none';
+        console.log('프레젠테이션 컨테이너 숨김');
+    }
     
     // 헤더 숨기기
     const mainHeader = document.getElementById('mainHeader');
@@ -634,15 +643,28 @@ function showLanding() {
 }
 
 function showPresentation() {
-    if (landingContainer) landingContainer.style.display = 'none';
-    if (presentationContainer) presentationContainer.style.display = 'block';
+    console.log('showPresentation 호출됨');
+    console.log('landingContainer:', !!landingContainer, 'presentationContainer:', !!presentationContainer);
+    
+    if (landingContainer) {
+        landingContainer.style.display = 'none';
+        console.log('랜딩 컨테이너 숨김');
+    }
+    if (presentationContainer) {
+        presentationContainer.style.display = 'block';
+        console.log('프레젠테이션 컨테이너 표시됨');
+    }
     
     // 헤더 표시
-    const mainHeader = document.getElementById('mainHeader');
-    if (mainHeader) mainHeader.style.display = 'block';
+    const headerContainer = document.getElementById('headerContainer');
+    if (headerContainer) {
+        headerContainer.style.display = 'block';
+        console.log('헤더 컨테이너 표시됨');
+    }
     
     // 슬라이드가 아직 초기화되지 않았다면 초기화
     if (slides.length === 0) {
+        console.log('슬라이드 초기화 시작');
         initializeSlides();
         setupEventListeners();
         setupEditingFeatures();
@@ -659,12 +681,13 @@ function showPresentation() {
     // 첫 번째 슬라이드 활성화
     if (slides.length > 0) {
         slides[0].classList.add('active');
+        console.log('첫 번째 슬라이드 활성화됨');
     }
     
     // UI 업데이트
     updateUI();
     
-    console.log('프레젠테이션 표시됨 - 현재 페이지:', currentPage);
+    console.log('프레젠테이션 표시 완료 - 현재 페이지:', currentPage, '총 슬라이드:', slides.length);
 }
 
 // 키보드 이벤트 처리
@@ -1700,51 +1723,64 @@ function setButtonLoading(button, isLoading) {
 
 // 인증 UI 업데이트
 function updateAuthUI(user) {
-    // Header 컴포넌트 업데이트
+    console.log('updateAuthUI 호출됨:', user ? '로그인됨' : '로그아웃됨');
+    
+    // Header 컴포넌트 업데이트 (먼저 실행)
     if (window.headerInstance) {
+        console.log('헤더 컴포넌트 updateAuthUI 호출');
         window.headerInstance.updateAuthUI(user);
     }
     
-    // 기존 UI 업데이트 (하위 호환성)
-    if (!authLogin || !authProfile) return;
-    
     if (user) {
-        // 로그인 상태
+        // 로그인 상태 - 프레젠테이션 표시
+        console.log('로그인 상태 - showPresentation 호출');
         showPresentation();
-        authLogin.style.display = 'none';
-        authProfile.style.display = 'block';
-        
-        // 사용자 정보 표시
-        if (userName) {
-            const userRole = getUserRole(user);
-            const roleEmoji = userRole === 'instructor' ? '👨‍🏫' : '👨‍🎓';
-            const roleName = userRole === 'instructor' ? '강사' : '학생';
-            userName.textContent = `${roleEmoji} ${user.displayName || roleName}`;
-        }
-        
-        if (userEmail) {
-            userEmail.textContent = user.email || (user.isAnonymous ? '게스트 사용자' : '이메일 없음');
-        }
-        
-        if (userAvatar) {
-            if (user.photoURL && !user.isAnonymous) {
-                userAvatar.src = user.photoURL;
-                userAvatar.style.display = 'block';
-            } else {
-                // 기본 아바타 또는 게스트 아이콘
-                userAvatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2Yzc1N2QiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMFYyMkgxOFYyMEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
-                userAvatar.style.display = 'block';
-            }
-        }
-        
         window.isFirebaseMode = true;
     } else {
+        // 로그아웃 상태 - 랜딩 표시  
+        console.log('로그아웃 상태 - showLanding 호출');
         showLanding();
-        // 로그아웃 상태
-        authLogin.style.display = 'block';
-        authProfile.style.display = 'none';
-        
         window.isFirebaseMode = false;
+    }
+    
+    // 기존 UI 업데이트 (동적으로 DOM 요소 찾기)
+    const currentAuthLogin = document.getElementById('authLogin');
+    const currentAuthProfile = document.getElementById('authProfile');
+    const currentUserName = document.getElementById('userName');
+    const currentUserEmail = document.getElementById('userEmail');
+    const currentUserAvatar = document.getElementById('userAvatar');
+    
+    if (currentAuthLogin && currentAuthProfile) {
+        if (user) {
+            currentAuthLogin.style.display = 'none';
+            currentAuthProfile.style.display = 'flex';
+            
+            // 사용자 정보 표시
+            if (currentUserName) {
+                const userRole = getUserRole(user);
+                const roleEmoji = userRole === 'instructor' ? '👨‍🏫' : '👨‍🎓';
+                const roleName = userRole === 'instructor' ? '강사' : '학생';
+                currentUserName.textContent = `${roleEmoji} ${user.displayName || roleName}`;
+            }
+            
+            if (currentUserEmail) {
+                currentUserEmail.textContent = user.email || (user.isAnonymous ? '게스트 사용자' : '이메일 없음');
+            }
+            
+            if (currentUserAvatar) {
+                if (user.photoURL && !user.isAnonymous) {
+                    currentUserAvatar.src = user.photoURL;
+                    currentUserAvatar.style.display = 'block';
+                } else {
+                    // 기본 아바타 또는 게스트 아이콘
+                    currentUserAvatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2Yzc1N2QiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC42ODYyOSAxNCA2IDE2LjY4NjMgNiAyMFYyMkgxOFYyMEMxOCAxNi42ODYzIDE1LjMxMzcgMTQgMTIgMTRaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
+                    currentUserAvatar.style.display = 'block';
+                }
+            }
+        } else {
+            currentAuthLogin.style.display = 'flex';
+            currentAuthProfile.style.display = 'none';
+        }
     }
 }
 
