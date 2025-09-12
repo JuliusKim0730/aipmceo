@@ -1135,6 +1135,14 @@ function addEditButtonsToCurrentSlide() {
     
     console.log('🎨 편집 버튼 추가 - 슬라이드', currentPage);
     
+    // 기존 편집 버튼 및 레이아웃 선택기 제거
+    currentSlide.querySelectorAll('.edit-button, .layout-selector').forEach(btn => btn.remove());
+    
+    // 레이아웃 선택기 추가 (관리자만)
+    if (window.currentUser && window.currentUser.isAdmin) {
+        addLayoutSelector(currentSlide);
+    }
+    
     // 1. 기존 data-field 방식 지원
     const editableFields = currentSlide.querySelectorAll('[data-field]');
     editableFields.forEach(element => {
@@ -1541,6 +1549,181 @@ function updateEditButtonsOnPageChange() {
     }
 }
 
+// 레이아웃 선택기 추가
+function addLayoutSelector(slide) {
+    if (!slide) return;
+    
+    // 레이아웃 선택기 생성
+    const layoutSelector = document.createElement('div');
+    layoutSelector.className = 'layout-selector';
+    layoutSelector.innerHTML = `
+        <label for="layout-select-${currentPage}">레이아웃:</label>
+        <select id="layout-select-${currentPage}" class="layout-dropdown">
+            <option value="">기본 레이아웃</option>
+            <option value="journey-layout">여정 레이아웃</option>
+            <option value="barrier-layout">장벽 레이아웃</option>
+            <option value="tech-skills-layout">기술 스킬 레이아웃</option>
+            <option value="fear-layout">두려움 레이아웃</option>
+            <option value="quote-layout">인용구 레이아웃</option>
+            <option value="process-layout">프로세스 레이아웃</option>
+            <option value="stats-layout">통계 레이아웃</option>
+            <option value="comparison-layout">비교 레이아웃</option>
+            <option value="pyramid-layout">피라미드 레이아웃</option>
+            <option value="timeline-layout">타임라인 레이아웃</option>
+            <option value="warning-layout">경고 레이아웃</option>
+            <option value="question-layout">질문 레이아웃</option>
+            <option value="thinking-layout">생각 레이아웃</option>
+            <option value="reason-layout">이유 레이아웃</option>
+            <option value="tech-layout">기술 레이아웃</option>
+            <option value="summary-layout">요약 레이아웃</option>
+            <option value="saas-layout">SaaS 레이아웃</option>
+        </select>
+        <button type="button" class="apply-layout-btn">레이아웃 적용</button>
+    `;
+    
+    // 슬라이드 상단에 추가
+    slide.insertBefore(layoutSelector, slide.firstChild);
+    
+    // 현재 레이아웃 감지 및 선택
+    const currentLayout = detectCurrentLayout(slide);
+    const selectElement = layoutSelector.querySelector('.layout-dropdown');
+    if (currentLayout) {
+        selectElement.value = currentLayout;
+    }
+    
+    // 레이아웃 적용 이벤트
+    const applyBtn = layoutSelector.querySelector('.apply-layout-btn');
+    applyBtn.addEventListener('click', () => {
+        const selectedLayout = selectElement.value;
+        applyLayoutToSlide(slide, selectedLayout);
+    });
+    
+    console.log('📐 레이아웃 선택기 추가됨');
+}
+
+// 현재 레이아웃 감지
+function detectCurrentLayout(slide) {
+    const layoutClasses = [
+        'journey-layout', 'barrier-layout', 'tech-skills-layout', 'fear-layout',
+        'quote-layout', 'process-layout', 'stats-layout', 'comparison-layout',
+        'pyramid-layout', 'timeline-layout', 'warning-layout', 'question-layout',
+        'thinking-layout', 'reason-layout', 'tech-layout', 'summary-layout', 'saas-layout'
+    ];
+    
+    for (const layoutClass of layoutClasses) {
+        if (slide.querySelector(`.${layoutClass}`)) {
+            return layoutClass;
+        }
+    }
+    return '';
+}
+
+// 슬라이드에 레이아웃 적용
+function applyLayoutToSlide(slide, layoutClass) {
+    if (!slide) return;
+    
+    console.log(`🎨 레이아웃 적용: ${layoutClass || '기본'}`);
+    
+    // 기존 레이아웃 클래스들 제거
+    const existingLayouts = slide.querySelectorAll('[class*="-layout"]');
+    existingLayouts.forEach(element => {
+        const classList = Array.from(element.classList);
+        classList.forEach(cls => {
+            if (cls.endsWith('-layout')) {
+                element.classList.remove(cls);
+            }
+        });
+        
+        // 레이아웃 클래스가 모두 제거되었으면 요소 자체를 제거
+        if (element.classList.length === 0 || 
+            Array.from(element.classList).every(cls => !cls.endsWith('-layout'))) {
+            // 내용이 있는 요소는 유지하고 빈 래퍼만 제거
+            if (element.children.length === 0 && !element.textContent.trim()) {
+                element.remove();
+            }
+        }
+    });
+    
+    // 새 레이아웃 적용
+    if (layoutClass) {
+        let layoutContainer = slide.querySelector('.slide-content');
+        if (!layoutContainer) {
+            layoutContainer = slide.querySelector('.slide-image') || slide;
+        }
+        
+        // 레이아웃 컨테이너 생성
+        const newLayoutDiv = document.createElement('div');
+        newLayoutDiv.className = layoutClass;
+        
+        // 기존 내용을 새 레이아웃으로 이동 (레이아웃 선택기 제외)
+        const existingContent = Array.from(slide.children).filter(child => 
+            !child.classList.contains('layout-selector') && 
+            !child.classList.contains('edit-button')
+        );
+        
+        existingContent.forEach(content => {
+            newLayoutDiv.appendChild(content.cloneNode(true));
+            content.remove();
+        });
+        
+        // 슬라이드에 새 레이아웃 추가
+        slide.appendChild(newLayoutDiv);
+        
+        showSaveStatus(`레이아웃 "${layoutClass}" 적용됨`, 'saved');
+    } else {
+        showSaveStatus('기본 레이아웃으로 변경됨', 'saved');
+    }
+    
+    // 편집 버튼 다시 추가
+    setTimeout(() => {
+        addEditButtonsToCurrentSlide();
+    }, 100);
+}
+
+// 로그아웃 버튼 추가 (헤더에)
+function addLogoutButton() {
+    if (!window.currentUser || !window.currentUser.isAdmin) return;
+    
+    const header = document.querySelector('.modern-header');
+    if (!header) return;
+    
+    // 기존 로그아웃 버튼 제거
+    const existingLogout = header.querySelector('.admin-logout-btn');
+    if (existingLogout) existingLogout.remove();
+    
+    // 로그아웃 버튼 생성
+    const logoutBtn = document.createElement('button');
+    logoutBtn.className = 'admin-logout-btn';
+    logoutBtn.textContent = '🚪 로그아웃';
+    logoutBtn.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        padding: 8px 16px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+    `;
+    
+    // 로그아웃 이벤트
+    logoutBtn.addEventListener('click', () => {
+        if (confirm('로그아웃하시겠습니까?')) {
+            window.currentUser = null;
+            window.location.reload();
+        }
+    });
+    
+    // 헤더에 추가
+    header.appendChild(logoutBtn);
+    
+    console.log('🚪 관리자 로그아웃 버튼 추가됨');
+}
+
 // 인증 초기화
 async function initializeAuth() {
     try {
@@ -1615,13 +1798,35 @@ async function initializeAuth() {
 function enableLocalMode() {
     console.log('📝 로컬 모드로 실행합니다.');
     
+    // 관리자 로그인 확인
+    const adminEmail = prompt('이메일을 입력하세요 (편집 권한을 위해):');
+    const isAdmin = adminEmail === 'meangyun0729@gmail.com';
+    
+    // 현재 사용자 설정
+    window.currentUser = {
+        uid: isAdmin ? 'admin-user' : 'local-user',
+        email: adminEmail || 'local@guest.com', 
+        displayName: isAdmin ? '관리자' : '로컬 사용자',
+        photoURL: null,
+        isAnonymous: !isAdmin,
+        isAdmin: isAdmin
+    };
+    
     // Firebase 모드 플래그 해제
     window.isFirebaseMode = false;
     
-    // 로컬 모드에서는 편집 모드 활성화
+    // 편집 모드 접근 권한 설정
     if (editModeToggle) {
-        editModeToggle.style.display = 'block';
-        editModeToggle.disabled = false;
+        if (isAdmin) {
+            editModeToggle.style.display = 'block';
+            editModeToggle.disabled = false;
+            console.log('👨‍💼 관리자 권한으로 편집 모드 활성화');
+            showSaveStatus('관리자 권한으로 로그인되었습니다', 'saved');
+        } else {
+            editModeToggle.style.display = 'none';
+            editModeToggle.disabled = true;
+            console.log('👤 일반 사용자 - 편집 모드 비활성화');
+        }
     }
     
     // 인증 UI는 랜딩에서 처리
@@ -1636,6 +1841,13 @@ function enableLocalMode() {
     
     // 편집 기능 활성화
     setupEditingFeatures();
+    
+    // 관리자인 경우 로그아웃 버튼 추가
+    if (window.currentUser && window.currentUser.isAdmin) {
+        setTimeout(() => {
+            addLogoutButton();
+        }, 1000);
+    }
     
     // 로컬 데이터 로드
     loadSavedData();
