@@ -1565,10 +1565,32 @@ async function initializeAuth() {
         // 인증 이벤트 리스너 설정
         setupAuthEventListeners();
         
-        // 인증 상태 변경 리스너 등록
+        // 인증 상태 변경 리스너 등록 (자동 로그인 방지)
         authService.onAuthStateChange((user) => {
-            updateAuthUI(user);
+            console.log('🔄 인증 상태 변경 감지:', user ? '로그인됨' : '로그아웃됨');
+            
+            // 헤더 UI만 업데이트하고 자동으로 프레젠테이션으로 이동하지 않음
+            if (window.headerInstance) {
+                window.headerInstance.updateAuthUI(user);
+            }
             updateEditModeAccess(user);
+            
+            // 명시적으로 로그인한 경우에만 프레젠테이션으로 이동
+            // (자동 로그인 방지)
+            if (user && window.isExplicitLogin) {
+                console.log('✅ 명시적 로그인 - 프레젠테이션으로 이동');
+                updateAuthUI(user);
+                window.isExplicitLogin = false; // 플래그 리셋
+            } else if (!user) {
+                // 로그아웃 시에만 랜딩으로 이동
+                updateAuthUI(user);
+            } else {
+                console.log('⚠️ 자동 로그인 감지 - 랜딩 페이지 유지');
+                // 자동 로그인된 경우 헤더만 업데이트하고 랜딩 페이지 유지
+                if (window.headerInstance) {
+                    window.headerInstance.updateAuthUI(user);
+                }
+            }
         });
         
         console.log('✅ 인증 시스템 초기화 완료');
@@ -1654,6 +1676,9 @@ function setupAuthEventListeners() {
 async function handleGoogleLogin() {
     if (!authService) return;
     
+    // 명시적 로그인 플래그 설정
+    window.isExplicitLogin = true;
+    
     // 로딩 상태 표시
     setButtonLoading(googleLoginBtn, true);
     
@@ -1678,6 +1703,9 @@ async function handleGoogleLogin() {
 // 게스트 로그인 처리
 async function handleGuestLogin() {
     if (!authService) return;
+    
+    // 명시적 로그인 플래그 설정
+    window.isExplicitLogin = true;
     
     // 로딩 상태 표시
     setButtonLoading(guestLoginBtn, true);

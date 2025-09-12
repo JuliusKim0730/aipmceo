@@ -11,11 +11,12 @@ class Header {
     initializeHeader() {
         this.createHeaderHTML();
         
-        // DOM 요소가 생성된 후 이벤트 바인딩
+        // DOM 요소가 생성된 후 이벤트 바인딩 - 더 긴 지연시간
         setTimeout(() => {
             this.bindEvents();
             this.debugDOMElements();
-        }, 100);
+            this.forceDropdownBinding(); // 강제 바인딩 추가
+        }, 200);
         
         console.log('✅ Header 컴포넌트 초기화 완료');
     }
@@ -351,6 +352,70 @@ class Header {
         console.log('🔍 DOM 요소 디버깅 완료');
     }
 
+    // 강제 드롭다운 바인딩
+    forceDropdownBinding() {
+        console.log('🔧 강제 드롭다운 바인딩 시도');
+        
+        // 전체 문서에서 드롭다운 요소 검색
+        const allDropdownTriggers = document.querySelectorAll('[id*="userDropdown"], [class*="user-dropdown"], [class*="dropdown-trigger"]');
+        console.log('📍 발견된 드롭다운 관련 요소들:', allDropdownTriggers);
+        
+        allDropdownTriggers.forEach((element, index) => {
+            console.log(`🎯 요소 ${index}:`, element.id, element.className);
+            
+            // 기존 이벤트 리스너 제거 후 새로 추가
+            element.removeEventListener('click', this.handleDropdownClick);
+            element.addEventListener('click', this.handleDropdownClick.bind(this));
+            
+            // 인라인 onclick 속성도 추가
+            element.setAttribute('onclick', 'window.headerInstance?.toggleDropdown()');
+        });
+        
+        // MutationObserver로 동적 요소 감지
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    const addedNodes = Array.from(mutation.addedNodes);
+                    addedNodes.forEach(node => {
+                        if (node.nodeType === 1 && node.id === 'userDropdownTrigger') {
+                            console.log('🔄 드롭다운 트리거 동적 추가 감지');
+                            this.bindDropdownEvents(node);
+                        }
+                    });
+                }
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // 드롭다운 클릭 핸들러
+    handleDropdownClick(e) {
+        console.log('🎯 강제 바인딩 드롭다운 클릭 감지!');
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.headerInstance) {
+            window.headerInstance.toggleDropdown();
+        }
+    }
+
+    // 개별 드롭다운 요소 바인딩
+    bindDropdownEvents(element) {
+        if (!element) return;
+        
+        console.log('🔗 개별 드롭다운 바인딩:', element);
+        
+        element.addEventListener('click', (e) => {
+            console.log('🖱️ 개별 바인딩 클릭!');
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleDropdown();
+        });
+        
+        element.style.cursor = 'pointer';
+        element.style.userSelect = 'none';
+    }
+
     // 드롭다운 토글
     toggleDropdown() {
         const dropdownMenu = document.getElementById('userDropdownMenu');
@@ -418,6 +483,9 @@ class Header {
         const googleLoginBtn = document.getElementById('googleLoginBtn');
         this.setButtonLoading(googleLoginBtn, true);
 
+        // 명시적 로그인 플래그 설정
+        window.isExplicitLogin = true;
+
         try {
             // 전역 인증 서비스 사용
             if (window.authService && window.authService.signInWithGoogle) {
@@ -443,6 +511,9 @@ class Header {
     async handleGuestLogin() {
         const guestLoginBtn = document.getElementById('guestLoginBtn');
         this.setButtonLoading(guestLoginBtn, true);
+
+        // 명시적 로그인 플래그 설정
+        window.isExplicitLogin = true;
 
         try {
             if (window.authService && window.authService.signInAnonymously) {
@@ -563,15 +634,9 @@ class Header {
         const dropdownUserEmail = document.getElementById('dropdownUserEmail');
 
         if (user) {
-            console.log('Header: 로그인 상태 - 프레젠테이션 표시 시도');
+            console.log('Header: 로그인 상태 - UI 업데이트만 수행');
             
-            // 로그인 상태 - 프레젠테이션 표시
-            if (typeof showPresentation === 'function') {
-                console.log('Header: showPresentation 함수 호출');
-                showPresentation();
-            } else {
-                console.error('Header: showPresentation 함수를 찾을 수 없음');
-            }
+            // 자동 프레젠테이션 이동 제거 - 명시적 로그인만 허용
             
             if (authLogin) {
                 authLogin.style.display = 'none';
