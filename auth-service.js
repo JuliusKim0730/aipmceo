@@ -81,9 +81,11 @@ class AuthService {
     // 구글 로그인
     async signInWithGoogle() {
         if (!this.isInitialized || !auth || !googleProvider) {
+            console.warn('Firebase 인증이 초기화되지 않음 - 로컬 모드로 전환');
             return {
                 success: false,
-                error: 'Firebase 인증이 초기화되지 않았습니다.'
+                error: 'Firebase 인증을 사용할 수 없습니다. 로컬 모드로 전환됩니다.',
+                fallbackToLocal: true
             };
         }
         
@@ -94,13 +96,28 @@ class AuthService {
             try {
                 result = await signInWithPopup(auth, googleProvider);
             } catch (popupError) {
+                console.error('팝업 로그인 오류:', popupError);
+                
+                // OAuth 도메인 승인 문제 감지
+                if (popupError?.code === 'auth/unauthorized-domain') {
+                    console.warn('승인되지 않은 도메인 - 로컬 모드로 전환');
+                    return {
+                        success: false,
+                        error: '현재 도메인이 승인되지 않았습니다. 로컬 모드로 전환됩니다.',
+                        fallbackToLocal: true
+                    };
+                }
+                
                 if (
                     popupError?.code === 'auth/popup-blocked' ||
                     popupError?.code === 'auth/popup-closed-by-user' ||
                     popupError?.code === 'auth/cancelled-popup-request'
                 ) {
-                    await signInWithRedirect(auth, googleProvider);
-                    return { success: false, error: '리다이렉트 로그인으로 전환되었습니다.' };
+                    return { 
+                        success: false, 
+                        error: '로그인이 취소되었습니다.',
+                        fallbackToLocal: false
+                    };
                 }
                 throw popupError;
             }
@@ -126,8 +143,13 @@ class AuthService {
             console.error('구글 로그인 오류:', error);
             
             let errorMessage = '로그인 중 오류가 발생했습니다.';
+            let fallbackToLocal = false;
             
             switch (error.code) {
+                case 'auth/unauthorized-domain':
+                    errorMessage = '현재 도메인이 승인되지 않았습니다. 로컬 모드로 전환됩니다.';
+                    fallbackToLocal = true;
+                    break;
                 case 'auth/popup-closed-by-user':
                     errorMessage = '로그인 창이 닫혔습니다.';
                     break;
@@ -140,13 +162,24 @@ class AuthService {
                 case 'auth/network-request-failed':
                     errorMessage = '네트워크 연결을 확인해주세요.';
                     break;
+                case 'auth/internal-error':
+                    errorMessage = 'Firebase 내부 오류가 발생했습니다. 로컬 모드로 전환됩니다.';
+                    fallbackToLocal = true;
+                    break;
                 default:
-                    errorMessage = error.message || '알 수 없는 오류가 발생했습니다.';
+                    if (error.message && error.message.includes('unauthorized-domain')) {
+                        errorMessage = '도메인 승인 오류가 발생했습니다. 로컬 모드로 전환됩니다.';
+                        fallbackToLocal = true;
+                    } else {
+                        errorMessage = error.message || '알 수 없는 오류가 발생했습니다.';
+                        fallbackToLocal = true; // 알 수 없는 오류는 로컬 모드로 전환
+                    }
             }
             
             return {
                 success: false,
-                error: errorMessage
+                error: errorMessage,
+                fallbackToLocal: fallbackToLocal
             };
         }
     }

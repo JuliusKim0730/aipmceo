@@ -494,7 +494,20 @@ class Header {
                     this.updateAuthUI(result.user);
                     this.showStatus('로그인 성공!', 'success');
                 } else {
-                    this.showStatus('로그인 실패: ' + result.error, 'error');
+                    // Firebase 오류 시 로컬 모드로 자동 전환
+                    if (result.fallbackToLocal) {
+                        console.log('🔄 Header: Firebase 오류로 인한 로컬 모드 자동 전환');
+                        this.showStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
+                        
+                        setTimeout(() => {
+                            if (window.enableLocalMode) {
+                                window.enableLocalMode();
+                                this.showStatus('로컬 모드가 활성화되었습니다', 'success');
+                            }
+                        }, 2000);
+                    } else {
+                        this.showStatus('로그인 실패: ' + result.error, 'error');
+                    }
                 }
             } else {
                 this.showStatus('인증 서비스가 사용할 수 없습니다.', 'error');
@@ -522,7 +535,20 @@ class Header {
                     this.updateAuthUI(result.user);
                     this.showStatus('게스트로 로그인했습니다.', 'success');
                 } else {
-                    this.showStatus('게스트 로그인 실패: ' + result.error, 'error');
+                    // Firebase 오류 시 로컬 모드로 자동 전환
+                    if (result.fallbackToLocal) {
+                        console.log('🔄 Header: Firebase 오류로 인한 로컬 게스트 모드 자동 전환');
+                        this.showStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
+                        
+                        setTimeout(() => {
+                            if (window.enableLocalMode) {
+                                window.enableLocalMode();
+                                this.showStatus('로컬 게스트 모드가 활성화되었습니다', 'success');
+                            }
+                        }, 2000);
+                    } else {
+                        this.showStatus('게스트 로그인 실패: ' + result.error, 'error');
+                    }
                 }
             } else {
                 // 로컬 게스트 모드

@@ -1558,7 +1558,12 @@ async function initializeAuth() {
         
         if (!firebaseLoaded || !authService) {
             console.warn('Firebase 모듈 로드 실패 - 로컬 모드로 전환');
-            enableLocalMode();
+            showSaveStatus('Firebase 연결 실패 - 로컬 모드로 전환됩니다', 'warning');
+            
+            setTimeout(() => {
+                enableLocalMode();
+                showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
+            }, 2000);
             return;
         }
         
@@ -1690,7 +1695,19 @@ async function handleGoogleLogin() {
             showSaveStatus('로그인 성공!', 'saved');
         } else {
             console.error('구글 로그인 실패:', result.error);
-            showSaveStatus(result.error, 'error');
+            
+            // Firebase 오류 시 로컬 모드로 자동 전환
+            if (result.fallbackToLocal) {
+                console.log('🔄 Firebase 오류로 인한 로컬 모드 자동 전환');
+                showSaveStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
+                
+                setTimeout(() => {
+                    enableLocalMode();
+                    showSaveStatus('로컬 모드가 활성화되었습니다', 'saved');
+                }, 2000);
+            } else {
+                showSaveStatus(result.error, 'error');
+            }
         }
     } catch (error) {
         console.error('구글 로그인 오류:', error);
@@ -1718,7 +1735,19 @@ async function handleGuestLogin() {
             showSaveStatus('게스트로 로그인했습니다.', 'saved');
         } else {
             console.error('게스트 로그인 실패:', result.error);
-            showSaveStatus(result.error, 'error');
+            
+            // Firebase 오류 시 로컬 모드로 자동 전환
+            if (result.fallbackToLocal) {
+                console.log('🔄 Firebase 오류로 인한 로컬 모드 자동 전환');
+                showSaveStatus('Firebase 인증 오류 - 로컬 모드로 전환됩니다', 'warning');
+                
+                setTimeout(() => {
+                    enableLocalMode();
+                    showSaveStatus('로컬 게스트 모드가 활성화되었습니다', 'saved');
+                }, 2000);
+            } else {
+                showSaveStatus(result.error, 'error');
+            }
         }
     } catch (error) {
         console.error('게스트 로그인 오류:', error);
