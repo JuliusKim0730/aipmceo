@@ -143,8 +143,8 @@ body {
 /* Presentation Container - 1920x1080 최적화 */
 .presentation-container {
     width: 100vw;
-    height: calc(100vh - 60px);
-    margin-top: 60px;
+    height: calc(100vh - 75px); /* Modern Header 높이 조정 */
+    margin-top: 75px; /* Modern Header 높이만큼 마진 */
     position: relative;
     display: flex;
     align-items: center;

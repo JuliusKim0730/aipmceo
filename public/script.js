@@ -830,7 +830,7 @@ function goToPage(pageNumber, direction = 'next') {
 
 // UI 업데이트
 function updateUI() {
-    // 페이지 번호 업데이트
+    // 기존 페이지 표시 요소 업데이트 (하위 호환성)
     if (currentPageSpan) {
         currentPageSpan.textContent = currentPage;
     }
@@ -839,15 +839,24 @@ function updateUI() {
     }
     
     // 챕터 정보 업데이트
+    const currentChapter = Math.ceil(currentPage / pagesPerChapter);
     if (chapterInfo) {
-        const currentChapter = Math.ceil(currentPage / pagesPerChapter);
         chapterInfo.textContent = `Chapter ${currentChapter}`;
     }
     
-    // 프로그레스 바 업데이트
+    // 프로그레스 바 업데이트 (하위 호환성)
     if (progressFill) {
         const progress = (currentPage / totalPages) * 100;
         progressFill.style.width = `${progress}%`;
+    }
+    
+    // Header 컴포넌트 업데이트
+    if (window.headerInstance) {
+        window.headerInstance.updatePageInfo(
+            currentPage, 
+            totalPages, 
+            `Chapter ${currentChapter}`
+        );
     }
     
     // 네비게이션 버튼 상태 업데이트
@@ -1040,27 +1049,41 @@ function toggleEditMode() {
 
 // 편집 모드 활성화
 function enableEditMode() {
-    editModeToggle.textContent = '🔒 편집 완료';
-    editModeToggle.classList.add('active');
+    if (editModeToggle) {
+        editModeToggle.textContent = '🔒 편집 완료';
+        editModeToggle.classList.add('active');
+    }
     document.body.classList.add('edit-mode');
     
     // 현재 슬라이드의 편집 가능한 요소들에 편집 버튼 추가
     addEditButtonsToCurrentSlide();
     
-    showSaveStatus('편집 모드 활성화', 'saved');
+    if (window.showSaveStatus) {
+        showSaveStatus('편집 모드 활성화', 'saved');
+    }
 }
 
 // 편집 모드 비활성화
 function disableEditMode() {
-    editModeToggle.textContent = '📝 편집 모드';
-    editModeToggle.classList.remove('active');
+    if (editModeToggle) {
+        editModeToggle.textContent = '📝 편집 모드';
+        editModeToggle.classList.remove('active');
+    }
     document.body.classList.remove('edit-mode');
     
     // 모든 편집 버튼 제거
     removeAllEditButtons();
     
-    showSaveStatus('편집 모드 비활성화', 'saved');
+    if (window.showSaveStatus) {
+        showSaveStatus('편집 모드 비활성화', 'saved');
+    }
 }
+
+// 전역으로 편집 모드 함수 노출
+window.enableEditMode = enableEditMode;
+window.disableEditMode = disableEditMode;
+window.showSaveStatus = showSaveStatus;
+window.toggleKeyboardHelp = toggleKeyboardHelp;
 
 // 현재 슬라이드에 편집 버튼 추가
 function addEditButtonsToCurrentSlide() {
@@ -1660,6 +1683,12 @@ function setButtonLoading(button, isLoading) {
 
 // 인증 UI 업데이트
 function updateAuthUI(user) {
+    // Header 컴포넌트 업데이트
+    if (window.headerInstance) {
+        window.headerInstance.updateAuthUI(user);
+    }
+    
+    // 기존 UI 업데이트 (하위 호환성)
     if (!authLogin || !authProfile) return;
     
     if (user) {

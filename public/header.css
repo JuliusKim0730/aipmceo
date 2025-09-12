@@ -1,0 +1,455 @@
+/* Modern Header Styles */
+.modern-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 60px;
+}
+
+/* 로고 섹션 */
+.header-left {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.title-icon {
+    margin-right: 8px;
+    font-size: 24px;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: -2px;
+    font-weight: 400;
+}
+
+/* 중앙 페이지 정보 */
+.header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.page-info {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.current-page {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    min-width: 24px;
+    text-align: center;
+}
+
+.page-separator {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+}
+
+.total-pages {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.chapter-info {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+/* 우측 컨트롤 */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 auto;
+}
+
+/* 편집 모드 버튼 */
+.edit-mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 8px 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.edit-mode-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.edit-mode-btn.active {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.edit-icon {
+    font-size: 16px;
+}
+
+/* 인증 섹션 */
+.auth-section {
+    display: flex;
+    align-items: center;
+}
+
+.auth-login {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.auth-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.auth-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.google-login {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.google-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.guest-login {
+    background: rgba(108, 117, 125, 0.8);
+}
+
+.guest-icon {
+    font-size: 14px;
+}
+
+/* 로그인 후 프로필 */
+.auth-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 6px 8px 6px 6px;
+    backdrop-filter: blur(5px);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.2;
+}
+
+.user-email {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.2;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.logout-icon {
+    font-size: 12px;
+}
+
+/* 컨트롤 버튼들 */
+.header-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.fullscreen-icon,
+.help-icon {
+    font-size: 16px;
+}
+
+/* 프로그레스 바 */
+.progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f5ff, #00d4ff);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+
+/* 로딩 상태 */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 8px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .header-left {
+        order: 1;
+        flex: 1;
+    }
+    
+    .header-center {
+        order: 3;
+        flex: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+    
+    .header-right {
+        order: 2;
+        flex: 0 0 auto;
+        gap: 8px;
+    }
+    
+    .header-title {
+        font-size: 16px;
+    }
+    
+    .title-icon {
+        font-size: 18px;
+    }
+    
+    .header-subtitle {
+        font-size: 10px;
+    }
+    
+    .auth-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    
+    .edit-mode-btn {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    
+    .control-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .user-email {
+        display: none;
+    }
+    
+    .edit-text {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content {
+        padding: 6px 12px;
+    }
+    
+    .auth-login {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .page-info {
+        padding: 6px 12px;
+        gap: 6px;
+    }
+    
+    .current-page {
+        font-size: 16px;
+    }
+    
+    .chapter-info {
+        display: none;
+    }
+}
+
+/* 편집 모드일 때 추가 스타일 */
+.edit-mode .modern-header {
+    border-bottom-color: rgba(255, 107, 107, 0.3);
+}
+
+.edit-mode .progress-fill {
+    background: linear-gradient(90deg, #ff6b6b, #ee5a52);
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
