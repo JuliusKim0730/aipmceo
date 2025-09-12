@@ -29,17 +29,32 @@ let isEditMode = false;
 let currentEditElement = null;
 let slideData = new Map(); // 슬라이드 데이터 캐시
 
-// DOM 요소들
-const landingContainer = document.getElementById('landingContainer');
-const presentationContainer = document.getElementById('presentationContainer');
-const slideContainer = document.getElementById('slideContainer');
-const currentPageSpan = document.querySelector('.current-page');
-const totalPagesSpan = document.querySelector('.total-pages');
-const chapterInfo = document.querySelector('.chapter-info');
-const progressFill = document.getElementById('progressFill');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const keyboardHelp = document.getElementById('keyboardHelp');
+// DOM 요소들 - 안전한 참조
+let landingContainer, presentationContainer, slideContainer;
+let currentPageSpan, totalPagesSpan, chapterInfo, progressFill;
+let prevBtn, nextBtn, keyboardHelp;
+
+// DOM 요소 초기화 함수
+function initializeDOMElements() {
+    landingContainer = document.getElementById('landingContainer');
+    presentationContainer = document.getElementById('presentationContainer');
+    slideContainer = document.getElementById('slideContainer');
+    currentPageSpan = document.querySelector('.current-page');
+    totalPagesSpan = document.querySelector('.total-pages');
+    chapterInfo = document.querySelector('.chapter-info');
+    progressFill = document.getElementById('progressFill');
+    prevBtn = document.getElementById('prevBtn');
+    nextBtn = document.getElementById('nextBtn');
+    keyboardHelp = document.getElementById('keyboardHelp');
+    
+    console.log('DOM 요소 초기화 완료:', {
+        landingContainer: !!landingContainer,
+        presentationContainer: !!presentationContainer,
+        slideContainer: !!slideContainer,
+        prevBtn: !!prevBtn,
+        nextBtn: !!nextBtn
+    });
+}
 
 // 편집 관련 DOM 요소들
 const editModeToggle = document.getElementById('editModeToggle');
@@ -70,10 +85,36 @@ const userAvatar = document.getElementById('userAvatar');
 const userName = document.getElementById('userName');
 const userEmail = document.getElementById('userEmail');
 
+// 페이지 로드 완료 대기 함수
+function waitForElementsToLoad() {
+    return new Promise((resolve) => {
+        const checkElements = () => {
+            // DOM 요소들 초기화
+            initializeDOMElements();
+            
+            if (slideContainer && prevBtn && nextBtn) {
+                console.log('✅ 모든 DOM 요소 로드 완료');
+                resolve();
+            } else {
+                console.log('⏳ DOM 요소 로딩 중...', {
+                    slideContainer: !!slideContainer,
+                    prevBtn: !!prevBtn,
+                    nextBtn: !!nextBtn
+                });
+                setTimeout(checkElements, 100);
+            }
+        };
+        checkElements();
+    });
+}
+
 // 초기화
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         console.log('🎯 기획자의 AI 창업 프레젠테이션 초기화 중...');
+        
+        // DOM 요소 로딩 완료 대기
+        await waitForElementsToLoad();
         
         // 초기에 랜딩 표시
         showLanding();
@@ -86,24 +127,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             enableLocalMode();
         }
         
-        // 로컬 데이터 로드
-        loadSavedData();
-        
-        // 페이지 로드 애니메이션
-        setTimeout(() => {
-            const activeSlide = document.querySelector('.slide.active');
-            if (activeSlide) {
-                activeSlide.classList.add('fade-in');
-            }
-        }, 100);
-        
-        // 저장된 데이터 복원
-        loadSavedData();
-        
         console.log('✅ 프레젠테이션이 준비되었습니다!');
         console.log('📝 편집 모드로 내용을 수정할 수 있습니다.');
     } catch (error) {
         console.error('초기화 오류:', error);
+        // 오류 발생 시 강제로 로컬 모드 활성화
+        setTimeout(() => {
+            enableLocalMode();
+        }, 1000);
     }
 });
 
@@ -521,12 +552,43 @@ function setupEventListeners() {
         slideContainer: !!slideContainer
     });
     
-    // 네비게이션 버튼
+    // 네비게이션 버튼 - 강력한 이벤트 바인딩
     if (prevBtn) {
-        prevBtn.addEventListener('click', () => goToPrevPage());
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('이전 페이지 버튼 클릭됨');
+            goToPrevPage();
+        });
+        
+        // 모바일 터치 이벤트도 추가
+        prevBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('이전 페이지 터치됨');
+            goToPrevPage();
+        });
+    } else {
+        console.error('prevBtn 요소를 찾을 수 없습니다');
     }
+    
     if (nextBtn) {
-        nextBtn.addEventListener('click', () => goToNextPage());
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('다음 페이지 버튼 클릭됨');
+            goToNextPage();
+        });
+        
+        // 모바일 터치 이벤트도 추가
+        nextBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('다음 페이지 터치됨');
+            goToNextPage();
+        });
+    } else {
+        console.error('nextBtn 요소를 찾을 수 없습니다');
     }
     
     // 키보드 이벤트
@@ -688,16 +750,19 @@ function goToPrevPage() {
 
 // 다음 페이지로 이동
 function goToNextPage() {
-    console.log('goToNextPage 호출됨 - currentPage:', currentPage, 'totalPages:', totalPages, 'isAnimating:', isAnimating);
+    console.log('🔄 goToNextPage 호출됨 - currentPage:', currentPage, 'totalPages:', totalPages, 'isAnimating:', isAnimating);
+    
     if (currentPage < totalPages && !isAnimating) {
+        console.log('✅ 다음 페이지로 이동 가능 - 페이지', currentPage + 1, '로 이동');
         goToPage(currentPage + 1, 'next');
     } else {
-        console.log('페이지 이동이 차단됨 - 조건 확인:', {
+        console.warn('❌ 페이지 이동이 차단됨 - 조건 확인:', {
             canGoNext: currentPage < totalPages,
             notAnimating: !isAnimating,
             currentPage,
             totalPages,
-            slidesLength: slides.length
+            slidesLength: slides.length,
+            reason: currentPage >= totalPages ? '마지막 페이지입니다' : '애니메이션 진행 중입니다'
         });
     }
 }
@@ -766,32 +831,36 @@ function goToPage(pageNumber, direction = 'next') {
 // UI 업데이트
 function updateUI() {
     // 페이지 번호 업데이트
-    currentPageSpan.textContent = currentPage;
-    totalPagesSpan.textContent = totalPages;
-    
-    // 챕터 정보 업데이트
-    const currentChapter = Math.ceil(currentPage / pagesPerChapter);
-    chapterInfo.textContent = `Chapter ${currentChapter}`;
-    
-    // 프로그레스 바 업데이트
-    const progress = (currentPage / totalPages) * 100;
-    progressFill.style.width = `${progress}%`;
-    
-    // 네비게이션 버튼 상태 업데이트
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
-    
-    // 네비게이션 버튼 스타일 업데이트
-    if (currentPage === 1) {
-        prevBtn.style.opacity = '0.5';
-    } else {
-        prevBtn.style.opacity = '1';
+    if (currentPageSpan) {
+        currentPageSpan.textContent = currentPage;
+    }
+    if (totalPagesSpan) {
+        totalPagesSpan.textContent = totalPages;
     }
     
-    if (currentPage === totalPages) {
-        nextBtn.style.opacity = '0.5';
-    } else {
-        nextBtn.style.opacity = '1';
+    // 챕터 정보 업데이트
+    if (chapterInfo) {
+        const currentChapter = Math.ceil(currentPage / pagesPerChapter);
+        chapterInfo.textContent = `Chapter ${currentChapter}`;
+    }
+    
+    // 프로그레스 바 업데이트
+    if (progressFill) {
+        const progress = (currentPage / totalPages) * 100;
+        progressFill.style.width = `${progress}%`;
+    }
+    
+    // 네비게이션 버튼 상태 업데이트
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
+        prevBtn.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.style.opacity = currentPage === totalPages ? '0.5' : '1';
+        nextBtn.style.cursor = currentPage === totalPages ? 'not-allowed' : 'pointer';
     }
 }
 
@@ -1431,12 +1500,17 @@ function enableLocalMode() {
     // 편집 기능 활성화
     setupEditingFeatures();
     
+    // 로컬 데이터 로드
+    loadSavedData();
+    
     // 프레젠테이션 보여주기
     showPresentation();
     
     // 로컬 모드 환영 메시지
     setTimeout(() => {
-        showSaveStatus('✨ 로컬 편집 모드 활성화됨', 'saved');
+        if (saveStatus) {
+            showSaveStatus('✨ 로컬 편집 모드 활성화됨', 'saved');
+        }
     }, 1000);
 }
 
