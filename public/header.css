@@ -20,7 +20,9 @@
     max-width: 100%;
     margin: 0 auto;
     min-height: 50px;
-    gap: 20px;
+    gap: 15px;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 
 /* 로고 섹션 */
@@ -255,9 +257,11 @@
 .header-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex: 0 0 auto;
-    max-width: 50%;
+    max-width: 60%;
+    flex-wrap: nowrap;
+    flex-shrink: 1;
 }
 
 /* 편집 모드 버튼 */
@@ -303,8 +307,10 @@
 
 .auth-login {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
 }
 
 .auth-btn {
@@ -614,20 +620,24 @@
 @media (max-width: 768px) {
     .header-content {
         padding: 6px 12px;
-        gap: 6px;
+        gap: 4px;
+        flex-wrap: nowrap;
     }
     
     .header-left {
-        min-width: 120px;
+        min-width: 100px;
+        flex-shrink: 1;
     }
     
     .header-center {
-        min-width: 100px;
+        min-width: 80px;
+        flex-shrink: 1;
     }
     
     .header-right {
-        gap: 4px;
-        max-width: 70%;
+        gap: 3px;
+        max-width: 75%;
+        flex-shrink: 0;
     }
     
     .header-title {
@@ -670,38 +680,52 @@
 @media (max-width: 480px) {
     .header-content {
         padding: 4px 8px;
-        gap: 4px;
+        gap: 2px;
+        flex-wrap: nowrap;
     }
     
     .header-left {
-        min-width: 100px;
+        min-width: 80px;
+        flex-shrink: 1;
     }
     
     .logo-section {
-        gap: 4px;
+        gap: 3px;
     }
     
     .header-title {
-        font-size: 14px;
+        font-size: 12px;
     }
     
     .title-icon {
-        font-size: 16px;
-        margin-right: 4px;
+        font-size: 14px;
+        margin-right: 3px;
     }
     
     .header-subtitle {
         display: none;
     }
     
+    .header-center {
+        min-width: 60px;
+        flex-shrink: 1;
+    }
+    
+    .header-right {
+        gap: 2px;
+        max-width: 80%;
+        flex-shrink: 0;
+    }
+    
     .auth-login {
-        flex-direction: column;
-        gap: 3px;
+        flex-direction: row;
+        gap: 2px;
+        flex-wrap: nowrap;
     }
     
     .auth-btn {
-        font-size: 9px;
-        padding: 3px 5px;
+        font-size: 8px;
+        padding: 2px 3px;
     }
     
     .page-info {

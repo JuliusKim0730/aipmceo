@@ -380,7 +380,11 @@ class Header {
         const userEmail = document.getElementById('userEmail');
 
         if (user) {
-            // 로그인 상태
+            // 로그인 상태 - 프레젠테이션 표시
+            if (typeof showPresentation === 'function') {
+                showPresentation();
+            }
+            
             if (authLogin) authLogin.style.display = 'none';
             if (authProfile) authProfile.style.display = 'flex';
 
