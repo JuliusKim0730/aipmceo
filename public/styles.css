@@ -815,6 +815,198 @@ body {
     }
 }
 
+/* 새로운 슬라이드 레이아웃 스타일들 */
+.journey-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.journey-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.journey-item h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #667eea;
+    margin: 0;
+    min-width: 40px;
+}
+
+.journey-item h3 {
+    font-size: 1.3rem;
+    margin: 0 0 8px 0;
+    color: white;
+}
+
+.journey-item p {
+    font-size: 1rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.barrier-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.barrier-item {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.barrier-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.barrier-item h3 {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: white;
+}
+
+.barrier-item p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.tech-skills-layout {
+    padding: 20px;
+}
+
+.skill-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.skill-item h4 {
+    margin: 0 0 10px 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.skill-points {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.skill-points li {
+    padding: 5px 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.skill-points li:before {
+    content: "• ";
+    color: #667eea;
+    font-weight: bold;
+}
+
+.fear-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.fear-card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fear-card h4 {
+    margin: 0 0 10px 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.fear-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.quote-layout {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.quote-mark {
+    font-size: 4rem;
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.quote-text {
+    font-size: 2rem;
+    color: white;
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+.process-layout {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+}
+
+.process-step {
+    text-align: center;
+    max-width: 200px;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 15px auto;
+}
+
+.process-step h4 {
+    margin: 10px 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.process-step p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.bottom-text {
+    text-align: center;
+    margin-top: 30px;
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+}
+
 @media (max-width: 768px) {
     .nav-controls {
         bottom: 20px;
