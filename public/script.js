@@ -109,18 +109,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // 슬라이드 초기화 및 동적 생성
 function initializeSlides() {
+    console.log('initializeSlides 시작');
+    
     // 기존 슬라이드 수집
     slides = Array.from(document.querySelectorAll('.slide'));
+    console.log('기존 슬라이드 개수:', slides.length);
     
     // 나머지 페이지들을 동적으로 생성
     generateRemainingSlides();
     
     // 슬라이드 배열 업데이트
     slides = Array.from(document.querySelectorAll('.slide'));
+    console.log('전체 슬라이드 개수:', slides.length);
     
     // 첫 번째 슬라이드를 active로 설정
     if (slides.length > 0) {
         slides[0].classList.add('active');
+        console.log('첫 번째 슬라이드 활성화 완료');
     }
 }
 
@@ -510,9 +515,19 @@ function createRegularContent(chapterNum, chapterTitle, pageTitle, pageNum, cont
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
+    console.log('setupEventListeners 호출됨 - DOM 요소 확인:', {
+        prevBtn: !!prevBtn,
+        nextBtn: !!nextBtn,
+        slideContainer: !!slideContainer
+    });
+    
     // 네비게이션 버튼
-    prevBtn.addEventListener('click', () => goToPrevPage());
-    nextBtn.addEventListener('click', () => goToNextPage());
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => goToPrevPage());
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => goToNextPage());
+    }
     
     // 키보드 이벤트
     document.addEventListener('keydown', handleKeyPress);
@@ -563,6 +578,14 @@ function showPresentation() {
     // 헤더 표시
     const mainHeader = document.getElementById('mainHeader');
     if (mainHeader) mainHeader.style.display = 'block';
+    
+    // 슬라이드가 아직 초기화되지 않았다면 초기화
+    if (slides.length === 0) {
+        initializeSlides();
+        updateUI();
+        setupEventListeners();
+        setupEditingFeatures();
+    }
 }
 
 // 키보드 이벤트 처리
@@ -665,14 +688,31 @@ function goToPrevPage() {
 
 // 다음 페이지로 이동
 function goToNextPage() {
+    console.log('goToNextPage 호출됨 - currentPage:', currentPage, 'totalPages:', totalPages, 'isAnimating:', isAnimating);
     if (currentPage < totalPages && !isAnimating) {
         goToPage(currentPage + 1, 'next');
+    } else {
+        console.log('페이지 이동이 차단됨 - 조건 확인:', {
+            canGoNext: currentPage < totalPages,
+            notAnimating: !isAnimating,
+            currentPage,
+            totalPages,
+            slidesLength: slides.length
+        });
     }
 }
 
 // 특정 페이지로 이동
 function goToPage(pageNumber, direction = 'next') {
+    console.log('goToPage 호출됨 - pageNumber:', pageNumber, 'direction:', direction, 'slides.length:', slides.length);
     if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage || isAnimating) {
+        console.log('goToPage 차단됨 - 조건 확인:', {
+            tooLow: pageNumber < 1,
+            tooHigh: pageNumber > totalPages,
+            sameePage: pageNumber === currentPage,
+            animating: isAnimating,
+            slidesLength: slides.length
+        });
         return;
     }
     
@@ -680,6 +720,18 @@ function goToPage(pageNumber, direction = 'next') {
     
     const currentSlide = slides[currentPage - 1];
     const targetSlide = slides[pageNumber - 1];
+    
+    if (!currentSlide || !targetSlide) {
+        console.error('슬라이드를 찾을 수 없음:', {
+            currentSlide: !!currentSlide,
+            targetSlide: !!targetSlide,
+            currentPage,
+            pageNumber,
+            slidesLength: slides.length
+        });
+        isAnimating = false;
+        return;
+    }
     
     // 현재 슬라이드 숨기기
     currentSlide.classList.remove('active');
@@ -1371,6 +1423,14 @@ function enableLocalMode() {
         authContainer.style.display = 'none';
     }
 
+    // 슬라이드 초기화
+    initializeSlides();
+    updateUI();
+    setupEventListeners();
+    
+    // 편집 기능 활성화
+    setupEditingFeatures();
+    
     // 프레젠테이션 보여주기
     showPresentation();
     
@@ -1529,8 +1589,8 @@ function updateAuthUI(user) {
     if (!authLogin || !authProfile) return;
     
     if (user) {
-        showPresentation();
         // 로그인 상태
+        showPresentation();
         authLogin.style.display = 'none';
         authProfile.style.display = 'block';
         
