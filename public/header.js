@@ -38,12 +38,28 @@ class Header {
 
                     <!-- 중앙 컨트롤들 -->
                     <div class="header-center">
+                        <!-- 썸네일 미리보기 -->
+                        <div class="slide-thumbnail" id="slideThumbnail" title="현재 슬라이드 미리보기">
+                            <div class="thumbnail-content" id="thumbnailContent">
+                                <div class="thumbnail-placeholder">📄</div>
+                            </div>
+                        </div>
+                        
                         <!-- 페이지 정보 -->
-                        <div class="page-info">
-                            <span class="current-page">1</span>
+                        <div class="page-info" title="클릭하여 페이지 이동">
+                            <button class="page-nav-btn" id="prevPageBtn" title="이전 페이지">‹</button>
+                            <span class="current-page" id="currentPageDisplay">1</span>
                             <span class="page-separator">/</span>
-                            <span class="total-pages">80</span>
-                            <div class="chapter-info">Chapter 1</div>
+                            <span class="total-pages" id="totalPagesDisplay">80</span>
+                            <button class="page-nav-btn" id="nextPageBtn" title="다음 페이지">›</button>
+                            <div class="chapter-info" id="chapterInfoDisplay">Chapter 1</div>
+                        </div>
+                        
+                        <!-- 페이지 입력 -->
+                        <div class="page-input-container" id="pageInputContainer" style="display: none;">
+                            <input type="number" id="pageInput" min="1" max="80" placeholder="페이지 번호">
+                            <button id="goToPageBtn">이동</button>
+                            <button id="cancelPageBtn">취소</button>
                         </div>
                     </div>
 
@@ -59,36 +75,31 @@ class Header {
                         <div class="auth-section" id="authSection">
                             <!-- 로그인 전 -->
                             <div class="auth-login" id="authLogin">
-                                <button class="auth-btn google-login" id="googleLoginBtn">
-                                    <svg class="google-icon" viewBox="0 0 24 24">
+                                <button class="auth-btn google-login" id="googleLoginBtn" title="Google 계정으로 로그인">
+                                    <svg class="google-icon" viewBox="0 0 24 24" width="12" height="12">
                                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                                     </svg>
-                                    Google 로그인
+                                    <span class="auth-text">Google</span>
                                 </button>
-                                <button class="auth-btn guest-login" id="guestLoginBtn">
+                                <button class="auth-btn guest-login" id="guestLoginBtn" title="게스트로 입장">
                                     <span class="guest-icon">👤</span>
-                                    게스트 모드
+                                    <span class="auth-text">게스트</span>
                                 </button>
                             </div>
 
                             <!-- 로그인 후 -->
                             <div class="auth-profile" id="authProfile" style="display: none;">
-                                <div class="user-info">
-                                    <img class="user-avatar" id="userAvatar" src="" alt="프로필">
-                                    <div class="user-details">
-                                        <span class="user-name" id="userName">사용자</span>
-                                        <span class="user-email" id="userEmail">user@example.com</span>
-                                    </div>
+                                <img class="user-avatar" id="userAvatar" src="" alt="프로필">
+                                <div class="user-info-compact">
+                                    <span class="user-name-compact" id="userName">사용자</span>
+                                    <span class="user-email-compact" id="userEmail">user@example.com</span>
                                 </div>
-                                <div class="user-actions">
-                                    <button class="action-btn logout-btn" id="logoutBtn" title="로그아웃">
-                                        <span class="logout-icon">🚪</span>
-                                        로그아웃
-                                    </button>
-                                </div>
+                                <button class="logout-btn-compact" id="logoutBtn" title="로그아웃">
+                                    <span class="logout-icon">🚪</span>
+                                </button>
                             </div>
                         </div>
 
@@ -120,6 +131,63 @@ class Header {
         const editModeBtn = document.getElementById('editModeBtn');
         if (editModeBtn) {
             editModeBtn.addEventListener('click', () => this.toggleEditMode());
+        }
+
+        // 페이지 네비게이션 버튼들
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        
+        if (prevPageBtn) {
+            prevPageBtn.addEventListener('click', () => {
+                if (typeof goToPrevPage === 'function') {
+                    goToPrevPage();
+                }
+            });
+        }
+        
+        if (nextPageBtn) {
+            nextPageBtn.addEventListener('click', () => {
+                if (typeof goToNextPage === 'function') {
+                    goToNextPage();
+                }
+            });
+        }
+
+        // 페이지 정보 클릭으로 페이지 입력 모드
+        const pageInfo = document.querySelector('.page-info');
+        if (pageInfo) {
+            pageInfo.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('page-nav-btn')) {
+                    this.showPageInput();
+                }
+            });
+        }
+
+        // 페이지 입력 기능
+        const goToPageBtn = document.getElementById('goToPageBtn');
+        const cancelPageBtn = document.getElementById('cancelPageBtn');
+        const pageInput = document.getElementById('pageInput');
+
+        if (goToPageBtn) {
+            goToPageBtn.addEventListener('click', () => {
+                this.goToInputPage();
+            });
+        }
+
+        if (cancelPageBtn) {
+            cancelPageBtn.addEventListener('click', () => {
+                this.hidePageInput();
+            });
+        }
+
+        if (pageInput) {
+            pageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.goToInputPage();
+                } else if (e.key === 'Escape') {
+                    this.hidePageInput();
+                }
+            });
         }
 
         // 인증 버튼들
@@ -409,6 +477,50 @@ class Header {
             const progress = (currentPage / totalPages) * 100;
             progressFill.style.width = `${progress}%`;
         }
+        
+        // 썸네일 업데이트
+        this.updateThumbnail(currentPage);
+        
+        // 페이지 네비게이션 버튼 상태 업데이트
+        this.updatePageNavButtons(currentPage, totalPages);
+    }
+    
+    // 썸네일 업데이트
+    updateThumbnail(currentPage) {
+        const thumbnailContent = document.getElementById('thumbnailContent');
+        if (!thumbnailContent) return;
+        
+        // 현재 슬라이드의 내용을 가져와서 썸네일 생성
+        const currentSlide = document.querySelector('.slide.active');
+        if (currentSlide) {
+            // 슬라이드의 제목이나 주요 내용을 추출
+            const slideTitle = currentSlide.querySelector('h1, h2, h3, .slide-title')?.textContent || `슬라이드 ${currentPage}`;
+            const slideContent = currentSlide.querySelector('p, .content, .slide-content')?.textContent || '';
+            
+            thumbnailContent.innerHTML = `
+                <div class="thumbnail-title">${slideTitle.substring(0, 20)}${slideTitle.length > 20 ? '...' : ''}</div>
+                <div class="thumbnail-text">${slideContent.substring(0, 40)}${slideContent.length > 40 ? '...' : ''}</div>
+            `;
+        } else {
+            thumbnailContent.innerHTML = `
+                <div class="thumbnail-placeholder">📄</div>
+                <div class="thumbnail-title">슬라이드 ${currentPage}</div>
+            `;
+        }
+    }
+    
+    // 페이지 네비게이션 버튼 상태 업데이트
+    updatePageNavButtons(currentPage, totalPages) {
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        
+        if (prevBtn) {
+            prevBtn.disabled = currentPage <= 1;
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = currentPage >= totalPages;
+        }
     }
 
     // 버튼 로딩 상태 설정
@@ -431,6 +543,60 @@ class Header {
             window.showSaveStatus(message, type === 'success' ? 'saved' : 'error');
         } else {
             console.log(`${type.toUpperCase()}: ${message}`);
+        }
+    }
+
+    // 페이지 입력 표시
+    showPageInput() {
+        const pageInfo = document.querySelector('.page-info');
+        const pageInputContainer = document.getElementById('pageInputContainer');
+        const pageInput = document.getElementById('pageInput');
+        
+        if (pageInfo && pageInputContainer && pageInput) {
+            pageInfo.style.display = 'none';
+            pageInputContainer.style.display = 'flex';
+            
+            // 현재 페이지를 기본값으로 설정
+            if (window.currentPage) {
+                pageInput.value = window.currentPage;
+            }
+            
+            // 포커스 및 선택
+            setTimeout(() => {
+                pageInput.focus();
+                pageInput.select();
+            }, 100);
+        }
+    }
+    
+    // 페이지 입력 숨기기
+    hidePageInput() {
+        const pageInfo = document.querySelector('.page-info');
+        const pageInputContainer = document.getElementById('pageInputContainer');
+        
+        if (pageInfo && pageInputContainer) {
+            pageInfo.style.display = 'flex';
+            pageInputContainer.style.display = 'none';
+        }
+    }
+    
+    // 입력된 페이지로 이동
+    goToInputPage() {
+        const pageInput = document.getElementById('pageInput');
+        if (!pageInput) return;
+        
+        const pageNumber = parseInt(pageInput.value);
+        const totalPages = window.totalPages || 80;
+        
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            if (typeof goToPage === 'function') {
+                goToPage(pageNumber);
+            }
+            this.hidePageInput();
+        } else {
+            this.showStatus(`페이지 번호는 1부터 ${totalPages} 사이여야 합니다.`, 'error');
+            pageInput.focus();
+            pageInput.select();
         }
     }
 

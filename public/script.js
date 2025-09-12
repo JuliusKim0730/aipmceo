@@ -644,10 +644,27 @@ function showPresentation() {
     // 슬라이드가 아직 초기화되지 않았다면 초기화
     if (slides.length === 0) {
         initializeSlides();
-        updateUI();
         setupEventListeners();
         setupEditingFeatures();
     }
+    
+    // 첫 페이지로 이동
+    currentPage = 1;
+    
+    // 모든 슬라이드 비활성화
+    slides.forEach(slide => {
+        slide.classList.remove('active', 'prev', 'next');
+    });
+    
+    // 첫 번째 슬라이드 활성화
+    if (slides.length > 0) {
+        slides[0].classList.add('active');
+    }
+    
+    // UI 업데이트
+    updateUI();
+    
+    console.log('프레젠테이션 표시됨 - 현재 페이지:', currentPage);
 }
 
 // 키보드 이벤트 처리
